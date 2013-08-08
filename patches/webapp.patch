@@ -1,0 +1,105 @@
+diff -x .svn -Bbur webapp/content/js/dashboard.js /var/lib/graphite/webapp/content/js/dashboard.js
+--- webapp/content/js/dashboard.js	2013-07-31 14:47:27.295049326 +0400
++++ /var/lib/graphite/webapp/content/js/dashboard.js	2013-07-31 14:37:06.793018076 +0400
+@@ -2352,8 +2352,23 @@
+ }
+ 
+ /* Keyboard shortcuts */
+-var keyEventHandlers = {
++var keyEventHandlers = (function() {
++  var go = function(d) {
++    return function() {
++      var cmp = Ext.getCmp("dashboards_list");
++      if (cmp) {
++        if (d == 0) return showDashboardFinder.openSelected();
++        var sel = cmp.all.elements.map(function(i) { return i.className.indexOf("selected") != -1 }).indexOf(true);
++        var last = cmp.all.elements.length - 1;
++        sel = sel + d;
++        if (sel < 0) sel = 0; else if (sel > last) sel = last;
++        cmp.select(sel);
++      }
++    };
++  };
++  return {
+   toggle_toolbar: toggleToolbar,
++  open_finder: showDashboardFinder,
+   toggle_metrics_panel: toggleNavBar,
+   give_completer_focus: focusCompleter,
+   erase_all_graphs: function () {
+@@ -2385,13 +2400,19 @@
+       } else {
+         sendSaveRequest(dashboardName);
+       }
+-    }
++    },
++  prev_dashboard: go(-1),
++  next_dashboard: go(+1),
++  select_dashboard: go(0)
+ };
++})();
+ 
+ var specialKeys = {
+   space: 32,
+   enter: Ext.EventObject.ENTER,
+-  backspace: Ext.EventObject.BACKSPACE
++  backspace: Ext.EventObject.BACKSPACE,
++  up: Ext.EventObject.UP,
++  down: Ext.EventObject.DOWN
+ };
+ 
+ var keyMapConfigs = [];
+@@ -2744,6 +2764,8 @@
+     }
+   });
+ 
++  arguments.callee.openSelected = openSelected;
++
+   function openSelected() {
+     var selected = dashboardsList.getSelectedRecords();
+     if (selected.length > 0) {
+@@ -2773,6 +2795,7 @@
+   }
+ 
+   dashboardsList = new Ext.list.ListView({
++    id : "dashboards_list",
+     columns: [
+       {header: 'Dashboard', width: 1.0, dataIndex: 'name', sortable: false}
+     ],
+diff -x .svn -Bbur webapp/graphite/dashboard/views.py /var/lib/graphite/webapp/graphite/dashboard/views.py
+--- webapp/graphite/dashboard/views.py	2013-07-31 01:42:12.167075595 +0400
++++ /var/lib/graphite/webapp/graphite/dashboard/views.py	2013-07-31 14:37:04.761037656 +0400
+@@ -1,7 +1,6 @@
+ import re
+ import errno
+ 
+-from graphite.logger import log
+ from os.path import getmtime, join, exists
+ from urllib import urlencode
+ from ConfigParser import ConfigParser
+@@ -31,12 +30,17 @@
+ }
+ defaultKeyboardShortcuts = {
+   'toggle_toolbar' : 'ctrl-z',
++  'open_finder' : 'alt-a',
+   'toggle_metrics_panel' : 'ctrl-space',
+   'erase_all_graphs' : 'alt-x',
+   'save_dashboard' : 'alt-s',
+   'completer_add_metrics' : 'alt-enter',
+   'completer_del_metrics' : 'alt-backspace',
+   'give_completer_focus' : 'shift-space',
++
++  'prev_dashboard' : 'up',
++  'next_dashboard' : 'down',
++  'select_dashboard' : 'enter',
+ }
+ 
+ ALL_PERMISSIONS = ['change', 'delete']
+@@ -48,7 +52,7 @@
+     self.ui_config = defaultUIConfig.copy()
+ 
+   def check(self):
+-    if getmtime(settings.DASHBOARD_CONF) > self.last_read:
++#    if getmtime(settings.DASHBOARD_CONF) > self.last_read:
+       self.load()
+ 
+   def load(self):
