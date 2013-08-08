@@ -2306,8 +2306,23 @@ function focusCompleter() {
 }
 
 /* Keyboard shortcuts */
-var keyEventHandlers = {
+var keyEventHandlers = (function() {
+  var go = function(d) {
+    return function() {
+      var cmp = Ext.getCmp("dashboards_list");
+      if (cmp) {
+        if (d == 0) return showDashboardFinder.openSelected();
+        var sel = cmp.all.elements.map(function(i) { return i.className.indexOf("selected") != -1 }).indexOf(true);
+        var last = cmp.all.elements.length - 1;
+        sel = sel + d;
+        if (sel < 0) sel = 0; else if (sel > last) sel = last;
+        cmp.select(sel);
+      }
+    };
+  };
+  return {
   toggle_toolbar: toggleToolbar,
+  open_finder: showDashboardFinder,
   toggle_metrics_panel: toggleNavBar,
   give_completer_focus: focusCompleter,
   erase_all_graphs: function () {
@@ -2339,13 +2354,19 @@ var keyEventHandlers = {
       } else {
         sendSaveRequest(dashboardName);
       }
-    }
+    },
+  prev_dashboard: go(-1),
+  next_dashboard: go(+1),
+  select_dashboard: go(0)
 };
+})();
 
 var specialKeys = {
   space: 32,
   enter: Ext.EventObject.ENTER,
-  backspace: Ext.EventObject.BACKSPACE
+  backspace: Ext.EventObject.BACKSPACE,
+  up: Ext.EventObject.UP,
+  down: Ext.EventObject.DOWN
 };
 
 var keyMapConfigs = [];
@@ -2698,6 +2719,8 @@ function showDashboardFinder() {
     }
   });
 
+  arguments.callee.openSelected = openSelected;
+
   function openSelected() {
     var selected = dashboardsList.getSelectedRecords();
     if (selected.length > 0) {
@@ -2727,6 +2750,7 @@ function showDashboardFinder() {
   }
 
   dashboardsList = new Ext.list.ListView({
+    id : "dashboards_list",
     columns: [
       {header: 'Dashboard', width: 1.0, dataIndex: 'name', sortable: false}
     ],

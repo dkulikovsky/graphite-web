@@ -29,6 +29,7 @@ defaultUIConfig = {
   'theme'                : 'default',
 }
 defaultKeyboardShortcuts = {
+  'open_finder' : 'alt-a',
   'toggle_toolbar' : 'ctrl-z',
   'toggle_metrics_panel' : 'ctrl-space',
   'erase_all_graphs' : 'alt-x',
@@ -36,6 +37,9 @@ defaultKeyboardShortcuts = {
   'completer_add_metrics' : 'alt-enter',
   'completer_del_metrics' : 'alt-backspace',
   'give_completer_focus' : 'shift-space',
+  'prev_dashboard' : 'up',
+  'next_dashboard' : 'down',
+  'select_dashboard' : 'enter',
 }
 
 ALL_PERMISSIONS = ['change', 'delete']
@@ -47,8 +51,8 @@ class DashboardConfig:
     self.ui_config = defaultUIConfig.copy()
 
   def check(self):
-    if getmtime(settings.DASHBOARD_CONF) > self.last_read:
-      self.load()
+    #if getmtime(settings.DASHBOARD_CONF) > self.last_read:
+    self.load()
 
   def load(self):
     schemes = [defaultScheme]
