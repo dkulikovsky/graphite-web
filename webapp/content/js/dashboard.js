@@ -19,6 +19,85 @@ var justClosedGraph = false;
 var NOT_EDITABLE = ['from', 'until', 'width', 'height', 'target', 'uniq', '_uniq'];
 var editor = null;
 
+var lastDragEvent = 0;
+
+Ext.DataView.DragSelector = function(cfg){
+    cfg = cfg || {};
+    var view, proxy, tracker;
+    var rs, bodyRegion, dragRegion = new Ext.lib.Region(0,0,0,0);
+    var dragSafe = cfg.dragSafe === true;
+	var offsets = { top: 37, right: -13, bottom: -87, left: 49 };
+
+    this.init = function(dataView){
+        view = dataView;
+        view.on('render', onRender);
+    };
+
+    function cancelClick(){
+        return false;
+    }
+
+    function onBeforeStart(e){
+        return !dragSafe || e.target == view.el.dom;
+    }
+
+    function onStart(e){
+        view.on('containerclick', cancelClick, view, {single:true});
+        if(!proxy){
+            proxy = view.el.createChild({cls:'x-view-selector'});
+        }else{
+            if(proxy.dom.parentNode !== view.el.dom){
+                view.el.dom.appendChild(proxy.dom);
+            }
+            proxy.setDisplayed('block');
+        }
+        view.clearSelections();
+		var boundingBox = e.target.getBoundingClientRect();
+		bodyRegion = new Ext.lib.Region(boundingBox.top + offsets.top, boundingBox.right + offsets.right, boundingBox.bottom + offsets.bottom, boundingBox.left + offsets.left);
+    }
+
+    function onDrag(e){
+        var startXY = tracker.startXY;
+        var xy = tracker.getXY();
+
+        var x = Math.min(startXY[0], xy[0]);
+        var y = Math.min(startXY[1], xy[1]);
+        var w = Math.abs(startXY[0] - xy[0]);
+        var h = Math.abs(startXY[1] - xy[1]);
+
+        dragRegion.left = x;
+        dragRegion.top = y;
+        dragRegion.right = x+w;
+        dragRegion.bottom = y+h;
+
+        dragRegion.constrainTo(bodyRegion);
+        proxy.setRegion(dragRegion);
+    }
+
+    function onEnd(e){
+        if (!Ext.isIE) {
+            view.un('containerclick', cancelClick, view);    
+        }        
+        if(proxy){
+            proxy.setDisplayed(false);
+        }
+		var boundingBox = e.target.getBoundingClientRect();
+		var boxWidth = (boundingBox.right - boundingBox.left - offsets.left + offsets.right);
+		view.fireEvent('dragevent', {left: 1.0 * (dragRegion.left - offsets.left - boundingBox.left) / boxWidth, width: 1.0 * (dragRegion.right - dragRegion.left) / boxWidth}, e);
+		lastDragEvent = new Date();
+    }
+
+    function onRender(view){
+        tracker = new Ext.dd.DragTracker({
+            onBeforeStart: onBeforeStart,
+            onStart: onStart,
+            onDrag: onDrag,
+            onEnd: onEnd
+        });
+        tracker.initEl(view.el);
+    }
+};
+
 var cookieProvider = new Ext.state.CookieProvider({
   path: "/dashboard"
 });
@@ -363,12 +442,13 @@ function initDashboard () {
       '<div class="graph-container">',
         '<div class="graph-overlay">',
           '<img class="graph-img" src="{url}" width="{width}" height="{height}">',
-          '<div class="overlay-close-button" onclick="javascript: graphStore.removeAt(\'{index}\'); updateGraphRecords(); justClosedGraph = true;">X</div>',
+          '<div class="overlay-close-button" onclick="javascript: graphClicked({index}, event)">*</div>', // FIXME
         '</div>',
       '</div>',
     '</tpl>',
     '<div class="x-clear"></div>'
   );
+
 
   function setupGraphDD () {
     graphView.dragZone = new Ext.dd.DragZone(graphView.getEl(), {
@@ -494,9 +574,40 @@ function initDashboard () {
 //      })
 //    ],
     listeners: {
-      click: graphClicked,
-      render: setupGraphDD
-    }
+      //click: graphClicked,
+      //render: setupGraphDD2
+      dragevent: {
+        fn: function(box, e) {
+		  var until = decodeURIComponent(/until=([^&]*)/.exec(e.target.src)[1]);
+		  var from = decodeURIComponent(/from=([^&]*)/.exec(e.target.src)[1]);
+		  var fromHours = /^-(\d+)hours$/.exec(from);
+		  if (fromHours)
+		    from = parseInt(new Date() / 1000) - parseInt(fromHours[1]) * 3600;
+		  else
+		    from = parseInt(from);
+		  if (until == '-')
+		    until = parseInt(new Date() / 1000);
+		  else
+			until = parseInt(until);
+		  /* from .. until */
+		  var width = until - from;
+		  until = parseInt(from + width * (box.left + box.width));
+		  from = parseInt(from + width * box.left);
+		  e.target.src = e.target.src.replace(/from=([^&]*)/, 'from=' + from).replace(/until=([^&]*)/, 'until=' + until);
+		}
+      },
+	  dblclick: {
+        fn: function(graphView, graphIndex, element, evt) {
+          var record = element.querySelector('img');
+		  if (!record) {
+            return;
+		  }
+
+		  record.src = record.src.replace(/from=([^&]*)/, 'from=-12hours').replace(/until=([^&]*)/, 'until=-');
+		}
+	  }
+    },
+	plugins: [new Ext.DataView.DragSelector()]
   });
 
   /* Toolbar items */
@@ -1658,7 +1769,10 @@ function showShareWindow() {
 var targetGrid;
 var activeMenu;
 
-function graphClicked(graphView, graphIndex, element, evt) {
+function graphClicked(graphIndex, evt) {
+  if (new Date() - lastDragEvent < 2000)
+    return;
+
   Ext.get('merge').hide();
   var record = graphStore.getAt(graphIndex);
   if (!record) {
@@ -1724,11 +1838,11 @@ function graphClicked(graphView, graphIndex, element, evt) {
     }
   });
 
-  var buttonWidth = 150;
+  var buttonWidth = 100;
   var rowHeight = 21;
   var maxRows = 6;
   var frameHeight = 5;
-  var gridWidth = (buttonWidth * 3) + 2;
+  var gridWidth = (buttonWidth * 4) + 2;
   var gridHeight = (rowHeight * Math.min(targets.length, maxRows)) + frameHeight;
 
   targetGrid = new Ext.grid.EditorGridPanel({
@@ -1886,6 +2000,20 @@ function graphClicked(graphView, graphIndex, element, evt) {
              }
   });
 
+  buttons.push({
+    xtype: 'button',
+	text: 'Delete Graph',
+	width: buttonWidth,
+	handler: function (thisButton) {
+	  graphStore.remove(record);
+	  updateGraphRecords();
+	  justClosedGraph = true;
+	  activeMenu.destroy();
+	  activeMenu = null;
+	  return;
+	}
+  });
+
   menuItems.push({
     xtype: 'panel',
     layout: 'hbox',
@@ -1898,7 +2026,7 @@ function graphClicked(graphView, graphIndex, element, evt) {
     items: menuItems
   });
   activeMenu = menu;
-  var position = evt.getXY();
+  var position = [evt.screenX, evt.screenY];
   position[0] -= (buttonWidth * 1.5) + 10; //horizontally center menu with the mouse
   menu.showAt(position);
   menu.get(0).focus(false, 50);
