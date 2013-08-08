@@ -2317,6 +2317,7 @@ var keyEventHandlers = (function() {
         sel = sel + d;
         if (sel < 0) sel = 0; else if (sel > last) sel = last;
         cmp.select(sel);
+        cmp.selected.elements[0].scrollIntoView();
       }
     };
   };
