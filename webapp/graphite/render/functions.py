@@ -1092,6 +1092,12 @@ def cactiStyle(requestContext, seriesList, system=None):
       last = safeLast(series)
       maximum = safeMax(series)
       minimum = safeMin(series)
+
+      if safeLen(series) is not None and safeSum(series) is not None:
+        avg = safeSum(series)/safeLen(series)
+      else:
+        avg = None
+
       if last is None:
         last = NAN
       else:
@@ -1105,12 +1111,16 @@ def cactiStyle(requestContext, seriesList, system=None):
         minimum = NAN
       else:
         minimum = fmt(float(minimum))
-        
-      series.name = "%*s Current:%*s Max:%*s Min:%*s " % \
+      if avg is None:
+        avg = NAN
+      else:
+        avg = fmt(float(avg))
+
+      series.name = "%*s Cur: %s Max: %s Avg: %s" % \
           (-nameLen, series.name,
-            -lastLen, last,
-            -maxLen, maximum,
-            -minLen, minimum)
+          last,
+          maximum,
+          avg)
   return seriesList
 
 def aliasByNode(requestContext, seriesList, *nodes):
