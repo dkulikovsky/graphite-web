@@ -49,7 +49,14 @@ from django.conf import settings
 
 def renderView(request):
   start = time()
-  (graphOptions, requestOptions) = parseOptions(request)
+  if 'json_request' in request.REQUEST:
+    json_request = json.loads(request.REQUEST.get('json_request', ''))
+    (graphOptions, requestOptions) = parseDataOptions(json_request)
+  elif request.is_ajax() and request.method == 'POST':
+    json_request = json.loads(request.raw_post_data)
+    (graphOptions, requestOptions) = parseDataOptions(json_request)
+  else:
+    (graphOptions, requestOptions) = parseOptions(request)
   useCache = 'noCache' not in requestOptions
   cacheTimeout = requestOptions['cacheTimeout']
   requestContext = {
@@ -217,7 +224,11 @@ def renderView(request):
 
 
 def parseOptions(request):
-  queryParams = request.REQUEST
+  return parseDataOptions(request.REQUEST)
+
+
+def parseDataOptions(data):
+  queryParams = data
 
   # Start with some defaults
   graphOptions = {'width' : 330, 'height' : 250}
@@ -233,6 +244,12 @@ def parseOptions(request):
   requestOptions['pieMode'] = queryParams.get('pieMode', 'average')
   requestOptions['cacheTimeout'] = int( queryParams.get('cacheTimeout', settings.DEFAULT_CACHE_DURATION) )
   requestOptions['targets'] = []
+  if hasattr(queryParams, 'getlist'):
+    requestOptions['targets'] = []
+    for target in queryParams.getlist('target'):
+      requestOptions['targets'].append(target)
+  else:
+    requestOptions['targets'] = queryParams.get('targets', [])
 
   # Extract the targets out of the queryParams
   mytargets = []
@@ -266,7 +283,7 @@ def parseOptions(request):
   # Fill in the graphOptions
   for opt in graphClass.customizable:
     if opt in queryParams:
-      val = queryParams[opt]
+      val = unicode(queryParams[opt])
       if (val.isdigit() or (val.startswith('-') and val[1:].isdigit())) and 'color' not in opt.lower():
         val = int(val)
       elif '.' in val and (val.replace('.','',1).isdigit() or (val.startswith('-') and val[1:].replace('.','',1).isdigit())):
