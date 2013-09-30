@@ -9,6 +9,6 @@ Homepage: http://github.com/graphite-project/
 Package: graphite-web
 Architecture: all
 Depends: ${shlibs:Depends}, ${misc:Depends}, 
-	python-cairo, python-tz, python-pyparsing, python-django-tagging, python-mysqldb, mysql-server, python-flup
+	python-cairo, python-tz, python-pyparsing, python-django-tagging, python-mysqldb, mysql-server, python-flup, haproxy
 Description: graph system uses ceres
  New graph system uses ceres
