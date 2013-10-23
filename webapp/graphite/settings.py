@@ -16,6 +16,7 @@ limitations under the License."""
 import sys, os
 from django import VERSION as DJANGO_VERSION
 from os.path import abspath, dirname, join
+from warnings import warn
 
 
 GRAPHITE_WEB_APP_SETTINGS_LOADED = False
@@ -82,6 +83,7 @@ RRD_CF = 'AVERAGE'
 USE_LDAP_AUTH = False
 LDAP_SERVER = "" # "ldapserver.mydomain.com"
 LDAP_PORT = 389
+LDAP_USE_TLS = False
 LDAP_SEARCH_BASE = "" # "OU=users,DC=mydomain,DC=com"
 LDAP_BASE_USER = "" # "CN=some_readonly_account,DC=mydomain,DC=com"
 LDAP_BASE_PASS = "" # "my_password"
@@ -90,6 +92,12 @@ LDAP_URI = None
 
 #Set this to True to delegate authentication to the web server
 USE_REMOTE_USER_AUTHENTICATION = False
+
+# Django 1.5 requires this so we set a default but warn the user
+SECRET_KEY = 'UNSAFE_DEFAULT'
+
+# Django 1.5 requires this to be set. Here we default to prior behavior and allow all
+ALLOWED_HOSTS = [ '*' ]
 
 # Override to link a different URL for login (e.g. for django_openid_auth)
 LOGIN_URL = '/account/login'
@@ -204,3 +212,6 @@ if USE_REMOTE_USER_AUTHENTICATION:
 
 if USE_LDAP_AUTH:
   AUTHENTICATION_BACKENDS.insert(0,'graphite.account.ldapBackend.LDAPBackend')
+
+if SECRET_KEY == 'UNSAFE_DEFAULT':
+  warn('SECRET_KEY is set to an unsafe default. This should be set in local_settings.py for better security')
