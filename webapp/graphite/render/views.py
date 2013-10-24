@@ -209,13 +209,6 @@ def renderView(request):
   except:
     graphOptions['defaultTemplate'] = "default" 
 
-  # add template to graphOptions
-  try:
-    user_profile = getProfile(request, allowDefault=False)
-    graphOptions['defaultTemplate'] = user_profile.defaultTemplate
-  except:
-    graphOptions['defaultTemplate'] = "default" 
-
 
   # We've got the data, now to render it
   graphOptions['data'] = data
