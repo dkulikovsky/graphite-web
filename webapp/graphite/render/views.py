@@ -14,6 +14,7 @@ limitations under the License."""
 import csv
 import math
 from datetime import datetime
+import sys
 from time import time
 from random import shuffle
 from httplib import CannotSendRequest
@@ -41,6 +42,7 @@ from graphite.render.hashing import hashRequest, hashData
 from graphite.render.glyph import GraphTypes
 
 from django.http import HttpResponse, HttpResponseServerError, HttpResponseRedirect
+from django.utils.datastructures import MultiValueDict
 from django.template import Context, loader
 from django.core.cache import cache
 from django.core.exceptions import ObjectDoesNotExist
@@ -49,14 +51,14 @@ from django.conf import settings
 
 def renderView(request):
   start = time()
-  if 'json_request' in request.REQUEST:
-    json_request = json.loads(request.REQUEST.get('json_request', ''))
-    (graphOptions, requestOptions) = parseDataOptions(json_request)
+
+  if request.REQUEST.has_key('json_request'):
+    (graphOptions, requestOptions) = parseDataOptions(request.REQUEST['json_request'])
   elif request.is_ajax() and request.method == 'POST':
-    json_request = json.loads(request.raw_post_data)
-    (graphOptions, requestOptions) = parseDataOptions(json_request)
+    (graphOptions, requestOptions) = parseDataOptions(request.raw_post_data)
   else:
     (graphOptions, requestOptions) = parseOptions(request)
+
   useCache = 'noCache' not in requestOptions
   cacheTimeout = requestOptions['cacheTimeout']
   requestContext = {
@@ -207,6 +209,13 @@ def renderView(request):
   except:
     graphOptions['defaultTemplate'] = "default" 
 
+  # add template to graphOptions
+  try:
+    user_profile = getProfile(request, allowDefault=False)
+    graphOptions['defaultTemplate'] = user_profile.defaultTemplate
+  except:
+    graphOptions['defaultTemplate'] = "default" 
+
 
   # We've got the data, now to render it
   graphOptions['data'] = data
@@ -231,12 +240,25 @@ def renderView(request):
 
 
 def parseOptions(request):
-  return parseDataOptions(request.REQUEST)
+  queryParams = request.REQUEST
+  return parseOptionsDictionary(queryParams)
 
 
 def parseDataOptions(data):
-  queryParams = data
+  queryParams = MultiValueDict()
+  try:
+    options = json.loads(data)
+    for k,v in options.items():
+      if isinstance(v, list):
+        queryParams.setlist(k, v)
+      else:
+        queryParams[k] = unicode(v)
+  except:
+    log.exception('json_request decode error')
+  return parseOptionsDictionary(queryParams)
 
+
+def parseOptionsDictionary(queryParams):
   # Start with some defaults
   graphOptions = {'width' : 330, 'height' : 250}
   requestOptions = {}
@@ -251,15 +273,13 @@ def parseDataOptions(data):
   requestOptions['pieMode'] = queryParams.get('pieMode', 'average')
   requestOptions['cacheTimeout'] = int( queryParams.get('cacheTimeout', settings.DEFAULT_CACHE_DURATION) )
   requestOptions['targets'] = []
-  if hasattr(queryParams, 'getlist'):
-    requestOptions['targets'] = []
-    for target in queryParams.getlist('target'):
-      requestOptions['targets'].append(target)
-  else:
-    requestOptions['targets'] = queryParams.get('targets', [])
 
   # Extract the targets out of the queryParams
   mytargets = []
+  # json_request format
+  if len(queryParams.getlist('targets')) > 0:
+    mytargets = queryParams.getlist('targets')
+
   # Normal format: ?target=path.1&target=path.2
   if len(queryParams.getlist('target')) > 0:
     mytargets = queryParams.getlist('target')
