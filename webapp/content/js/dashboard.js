@@ -580,12 +580,13 @@ function initDashboard () {
         fn: function(box, e) {
 		  var until = decodeURIComponent(/until=([^&]*)/.exec(e.target.src)[1]);
 		  var from = decodeURIComponent(/from=([^&]*)/.exec(e.target.src)[1]);
-		  var fromHours = /^-(\d+)hours$/.exec(from);
+		  var fromHours = /^-(\d+)(minutes|hours|days|weeks|months)$/.exec(from);
+		  var fromMult = [60, 3600, 86400, 7*86400, 30*86400];
 		  if (fromHours)
-		    from = parseInt(new Date() / 1000) - parseInt(fromHours[1]) * 3600;
+		    from = parseInt(new Date() / 1000) - parseInt(fromHours[1]) * fromMult['minutes hours days weeks months'.split(' ').indexOf(fromHours[2])];
 		  else
 		    from = parseInt(from);
-		  if (until == '-')
+		  if (until == '-' || until == 'now')
 		    until = parseInt(new Date() / 1000);
 		  else
 			until = parseInt(until);
@@ -593,17 +594,58 @@ function initDashboard () {
 		  var width = until - from;
 		  until = parseInt(from + width * (box.left + box.width));
 		  from = parseInt(from + width * box.left);
+		  if (!e.target.hasAttribute("origsrc"))
+		    e.target.setAttribute("origsrc", e.target.src);
 		  e.target.src = e.target.src.replace(/from=([^&]*)/, 'from=' + from).replace(/until=([^&]*)/, 'until=' + until);
 		}
       },
-	  dblclick: {
+	  click: {
         fn: function(graphView, graphIndex, element, evt) {
+          if (new Date() - lastDragEvent < 500)
+            return;
           var record = element.querySelector('img');
 		  if (!record) {
             return;
 		  }
 
-		  record.src = record.src.replace(/from=([^&]*)/, 'from=-12hours').replace(/until=([^&]*)/, 'until=-');
+		  if (record.getAttribute("origsrc"))
+		    record.src = record.getAttribute("origsrc");
+		}
+	  },
+	  dblclick: {
+        fn: function(graphView, graphIndex, element, evt) {
+		  if (GraphSize.width == defaultGraphParams.width)
+		  {
+            GraphSize.width = window.innerWidth - 64;
+		    GraphSize.height = window.innerHeight - 80;
+		  }
+		  else
+		  {
+            GraphSize.width = defaultGraphParams.width;
+		    GraphSize.height = defaultGraphParams.height;
+		  }
+		  /*
+		     graphStore.each(function (item, index) {
+    var params = {};
+    Ext.apply(params, defaultGraphParams);
+    Ext.apply(params, item.data.params);
+    Ext.apply(params, GraphSize);
+    params._uniq = Math.random();
+    if (params.title === undefined && params.target.length == 1) {
+      params.title = params.target[0];
+    }
+    if (!params.uniq === undefined) {
+        delete params["uniq"];
+    }
+    item.set('url', '/render?' + Ext.urlEncode(params));
+    item.set('width', GraphSize.width);
+    item.set('height', GraphSize.height);
+    item.set('index', index);
+  });
+*
+		   */
+		  refreshGraphs();
+		  //FIXME
 		}
 	  }
     },
@@ -855,6 +897,7 @@ function initDashboard () {
     applyState(initialState);
     navBar.collapse();
   }
+  navBar.toggleCollapse(true);
 
   if(window.location.hash != '')
   {
@@ -2127,8 +2170,9 @@ function breakoutGraph(record) {
 }
 
 function mailGraph(record) {
-  var mygraphParams = record.get('params');
-  var newparams = Ext.encode(Ext.apply(mygraphParams, defaultGraphParams));
+  mygraphParams = record.get('params');
+  mygraphParams['target'] = record.data['target'];
+  newparams = Ext.encode(Ext.apply(mygraphParams, defaultGraphParams));
 
   var fromField = new Ext.form.TextField({
     fieldLabel: "From",
