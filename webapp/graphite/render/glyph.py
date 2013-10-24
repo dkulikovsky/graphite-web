@@ -171,7 +171,11 @@ class Graph:
       'ymax' : self.height - self.margin,
     }
 
-    self.loadTemplate( params.get('template','default') )
+    graph_template = params.get('template')
+    if graph_template:
+      self.loadTemplate(graph_template)
+    else:
+      self.loadTemplate( params.get('defaultTemplate','default') )
 
     self.setupCairo( params.get('outputFormat','png').lower() )
 

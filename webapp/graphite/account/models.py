@@ -21,6 +21,7 @@ class Profile(models.Model):
   user = models.OneToOneField(auth_models.User)
   history = models.TextField(default="")
   advancedUI = models.BooleanField(default=False)
+  defaultTemplate = models.CharField(default="default", max_length=255)
   __str__ = lambda self: "Profile for %s" % self.user
 
 class Variable(models.Model):

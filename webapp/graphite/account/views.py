@@ -54,6 +54,8 @@ def updateProfile(request):
   profile = getProfile(request,allowDefault=False)
   if profile:
     profile.advancedUI = request.POST.get('advancedUI','off') == 'on'
+    default_template = request.POST.get('defaultTemplate','default')
+    profile.defaultTemplate = default_template.replace(" ","")
     profile.save()
   nextPage = request.POST.get('nextPage','/')
   return HttpResponseRedirect(nextPage)

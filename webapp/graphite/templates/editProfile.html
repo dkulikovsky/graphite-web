@@ -20,7 +20,8 @@ limitations under the License. -->
 <input type='hidden' name='nextPage' value='{{nextPage}}'/>
 {% endif %}
 
-<input type='checkbox' name='advancedUI' value='on' {% if profile.advancedUI %}checked{% endif %}>
+<input type='checkbox' name='advancedUI' value='on' {% if profile.advancedUI %}checked{% endif %}><br>
+<input type='text' name='defaultTemplate' value='{% if profile.defaultTemplate %}{{ profile.defaultTemplate }}{% endif %}'>
 Enable advanced/experimental UI features<br/>
 
 <input type='submit' value='Update Profile'>

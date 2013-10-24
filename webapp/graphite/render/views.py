@@ -31,7 +31,7 @@ try:  # See if there is a system installation of pytz first
 except ImportError:  # Otherwise we fall back to Graphite's bundled version
   from graphite.thirdparty import pytz
 
-from graphite.util import getProfileByUsername, json, unpickle
+from graphite.util import getProfileByUsername, getProfile, json, unpickle
 from graphite.remote_storage import HTTPConnectionWithTimeout
 from graphite.logger import log
 from graphite.render.evaluator import evaluateTarget
@@ -199,6 +199,13 @@ def renderView(request):
 
       log.rendering('Total pickle rendering time %.6f' % (time() - start))
       return response
+
+  # add template to graphOptions
+  try:
+    user_profile = getProfile(request, allowDefault=False)
+    graphOptions['defaultTemplate'] = user_profile.defaultTemplate
+  except:
+    graphOptions['defaultTemplate'] = "default" 
 
 
   # We've got the data, now to render it
