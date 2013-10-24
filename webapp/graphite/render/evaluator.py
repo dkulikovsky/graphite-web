@@ -2,8 +2,8 @@ import datetime
 import time
 from django.conf import settings
 from graphite.render.grammar import grammar
+from graphite.logger import log
 from graphite.render.datalib import fetchData, TimeSeries
-
 
 def evaluateTarget(requestContext, target):
   tokens = grammar.parseString(target)
@@ -24,11 +24,15 @@ def evaluateTokens(requestContext, tokens):
     return fetchData(requestContext, tokens.pathExpression)
 
   elif tokens.call:
+    try:
     func = SeriesFunctions[tokens.call.funcname]
     args = [evaluateTokens(requestContext, arg) for arg in tokens.call.args]
     kwargs = dict([(kwarg.argname, evaluateTokens(requestContext, kwarg.args[0]))
                    for kwarg in tokens.call.kwargs])
     return func(requestContext, *args, **kwargs)
+    except ValueError:
+      log.exception('value error when render') 
+      return []
 
   elif tokens.number:
     if tokens.number.integer:
