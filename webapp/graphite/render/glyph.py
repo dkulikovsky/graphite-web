@@ -306,15 +306,14 @@ class Graph:
   def drawLegend(self, elements, unique=False): #elements is [ (name,color,rightSide), (name,color,rightSide), ... ]
     self.encodeHeader('legend')
 
-    if unique:
-      # remove duplicate names
-      namesSeen = []
-      newElements = []
-      for e in elements:
-        if e[0] not in namesSeen:
-          namesSeen.append(e[0])
-          newElements.append(e)
-      elements = newElements
+    # remove duplicate names
+    namesSeen = []
+    newElements = []
+    for e in elements:
+      if e[0] not in namesSeen:
+        namesSeen.append(e[0])
+        newElements.append(e)
+    elements = newElements
 
     # Check if there's enough room to use two columns.
     rightSideLabels = False
