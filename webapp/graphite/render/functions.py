@@ -20,6 +20,7 @@ import math
 import re
 import random
 import time
+import codecs
 
 from graphite.logger import log
 from graphite.render.attime import parseTimeOffset
@@ -141,6 +142,13 @@ def formatPathExpressions(seriesList):
    [pathExpressions.append(s.pathExpression) for s in seriesList if not pathExpressions.count(s.pathExpression)]
    return ','.join(pathExpressions)
 
+def formatPathExpressions_diff_special(seriesList):
+   # remove duplicates
+   pathExpressions = []
+   [pathExpressions.append(s.pathExpression) for s in seriesList]
+   return ','.join(pathExpressions)
+
+
 # Series Functions
 
 #NOTE: Some of the functions below use izip, which may be problematic.
@@ -255,7 +263,7 @@ def diffSeries(requestContext, *seriesLists):
 
   """
   (seriesList,start,end,step) = normalize(seriesLists)
-  name = "diffSeries(%s)" % formatPathExpressions(seriesList)
+  name = "diffSeries(%s)" % formatPathExpressions_diff_special(seriesList)
   values = ( safeDiff(row) for row in izip(*seriesList) )
   series = TimeSeries(name,start,end,step,values)
   series.pathExpression = name
@@ -816,6 +824,26 @@ def consolidateBy(requestContext, seriesList, consolidationFunc):
     series.name = 'consolidateBy(%s,"%s")' % (series.name, series.consolidationFunc)
     series.pathExpression = series.name
   return seriesList
+
+def yabsDerivative(requestContext, seriesList):
+  results = []
+  for series in seriesList:
+    newValues = []
+    prev = None
+    for val in series:
+      if None in (prev, val):
+        newValues.append(None)
+      else:
+        newValues.append(val - prev)
+        prev = val
+
+      if prev is None: prev = val
+
+    newName = "yabsDerivative(%s)" % series.name
+    newSeries = TimeSeries(newName, series.start, series.end, series.step, newValues)
+    newSeries.pathExpression = newName
+    results.append(newSeries)
+  return results
 
 def derivative(requestContext, seriesList):
   """
@@ -1651,6 +1679,50 @@ def removeBelowValue(requestContext, seriesList, n):
         s[index] = None
 
   return seriesList
+
+def percentileOrdinal(n, series):
+  result = int( safeDiv(n * len(series), 100) + 0.5 )
+  return result
+
+def nPercentile(requestContext, seriesList, n):
+  """Returns n-percent of each series in the seriesList."""
+  assert n, 'The requested percent is required to be greater than 0'
+
+  results = []
+  for s in seriesList:
+    # Create a sorted copy of the TimeSeries excluding None values in the values list.
+    s_copy = TimeSeries( s.name, s.start, s.end, s.step, sorted( [item for item in s if item is not None] ) )
+    if not s_copy:
+      continue  # Skip this series because it is empty.
+
+    pord = percentileOrdinal( n, s_copy )
+    perc_val = s_copy[ pord - 1 if pord > 0 else pord ]
+    if perc_val:
+      results.append( TimeSeries( '%dth Percentile(%s, %.1f)' % ( n, s_copy.name, perc_val ),
+                                  s_copy.start, s_copy.end, s_copy.step, [perc_val] ) )
+  return results
+
+def percentileOrdinal(n, series):
+  result = int( safeDiv(n * len(series), 100) + 0.5 )
+  return result
+
+def nPercentile(requestContext, seriesList, n):
+  """Returns n-percent of each series in the seriesList."""
+  assert n, 'The requested percent is required to be greater than 0'
+
+  results = []
+  for s in seriesList:
+    # Create a sorted copy of the TimeSeries excluding None values in the values list.
+    s_copy = TimeSeries( s.name, s.start, s.end, s.step, sorted( [item for item in s if item is not None] ) )
+    if not s_copy:
+      continue  # Skip this series because it is empty.
+
+    pord = percentileOrdinal( n, s_copy )
+    perc_val = s_copy[ pord - 1 if pord > 0 else pord ]
+    if perc_val:
+      results.append( TimeSeries( '%dth Percentile(%s, %.1f)' % ( n, s_copy.name, perc_val ),
+                                  s_copy.start, s_copy.end, s_copy.step, [perc_val] ) )
+  return results
 
 def limit(requestContext, seriesList, n):
   """
@@ -2726,6 +2798,31 @@ def timeFunction(requestContext, name):
 
   return [series]
 
+
+def yabsStatLag(requestContext, seriesList):
+  results = []
+  for series in seriesList:
+    step = series.step
+    delta = timedelta(seconds=step)
+    when = requestContext["startTime"]
+    newValues = []
+    i = 0
+
+    while when < requestContext["endTime"]:
+      if i < len(series) and series[i] != None:
+        newValues.append(time.mktime(when.timetuple()) - series[i])
+      else:
+        newValues.append(None)
+      i += 1
+      when += delta
+
+    newName = "yabsStatLag(%s)" % series.name
+    newSeries = TimeSeries(newName, series.start, series.end, series.step, newValues)
+    newSeries.pathExpression = newName
+    results.append(newSeries)
+  return results
+
+
 def sinFunction(requestContext, name, amplitude=1):
   """
   Short Alias: sin()
@@ -2873,6 +2970,7 @@ SeriesFunctions = {
   'offsetToZero' : offsetToZero,
   'derivative' : derivative,
   'perSecond' : perSecond,
+  'yabsDerivative' : yabsDerivative,
   'integral' : integral,
   'percentileOfSeries': percentileOfSeries,
   'nonNegativeDerivative' : nonNegativeDerivative,
@@ -2896,6 +2994,7 @@ SeriesFunctions = {
   'pct' : asPercent,
   'diffSeries' : diffSeries,
   'divideSeries' : divideSeries,
+  'yabsStatLag' : yabsStatLag,
 
   # Series Filter functions
   'mostDeviant' : mostDeviant,
