@@ -29,6 +29,40 @@ try:
 except ImportError:
   import pickle
 
+def history(request):
+  query = request.GET.urlencode()
+  view_dict = [ ('5 min', '5min'),
+                ('1 hour', '1hour'),
+                ('6 hours', '6hour'),
+                ('1 day', '1day'),
+                ('1 week', '1week'),
+                ('1 month', '1month'),
+                ('3 month', '3month'),
+                ('1 year', '1year')]
+  views = []
+  query = re.sub(r'width=[0-9]+','width=800', query)
+  query = re.sub(r'height=[0-9]+','height=350', query)
+  for key in view_dict:
+    views.append( (key[0], re.sub(r'from=.*?&',"from=-%s&" % key[1], query), "bsgraphite.yandex.ru") )
+  log.info("DEBUG: views = %s" % views)
+  context = {}
+  context['views'] = views
+  context['purpose'] = "history"
+  return render_to_response("history.html", context)
+
+def bsdebug(request):
+  query = request.GET.urlencode()
+  views = []
+  query = re.sub(r'width=[0-9]+','width=800', query)
+  query = re.sub(r'height=[0-9]+','height=350', query)
+  bsgraphite_arr = [ "1-01i", "1-02i", "1-03i", "1-01e", "1-02e", "1-01h", "1-02h", "1-03h" ]
+  for host in bsgraphite_arr:
+    views.append( (host, query, "bsgraphite%s.yandex.ru" % host) )
+  context = {}
+  context['views'] = views
+  context['purpose'] = "debug"
+  return render_to_response("history.html", context)
+
 
 def header(request):
   "View for the header frame of the browser UI"

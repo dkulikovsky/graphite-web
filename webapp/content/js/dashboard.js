@@ -1968,6 +1968,24 @@ function graphClicked(graphIndex, evt) {
     }, {
       xtype: 'button',
       fieldLabel: "<span style='visibility: hidden'>",
+      text: 'Show',
+      width: 100,
+      handler: function () { menu.destroy(); window.open('/graphlot/?' + record.data.url.replace('/render',''),'_blank'); }
+    }, {
+      xtype: 'button',
+      fieldLabel: "<span style='visibility: hidden'>",
+      text: 'History',
+      width: 100,
+      handler: function () { menu.destroy(); window.open('/history' + record.data.url.replace('/render',''),'_blank'); }
+    }, {
+      xtype: 'button',
+      fieldLabel: "<span style='visibility: hidden'>",
+      text: 'Graph debug',
+      width: 100,
+      handler: function () { menu.destroy(); window.open('/bsdebug' + record.data.url.replace('/render',''),'_blank'); }
+    }, {
+      xtype: 'button',
+      fieldLabel: "<span style='visibility: hidden'>",
       text: 'Email',
       width: 100,
       handler: function () { menu.destroy(); mailGraph(record); }

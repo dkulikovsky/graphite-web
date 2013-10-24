@@ -19,5 +19,7 @@ urlpatterns = patterns('graphite.browser.views',
   ('^search/?$', 'search'),
   ('^mygraph/?$', 'myGraphLookup'),
   ('^usergraph/?$', 'userGraphLookup'),
+  ('^history', 'history'),
+  ('^bsdebug', 'bsdebug'),
   ('^$', 'browser'),
 )

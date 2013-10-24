@@ -32,6 +32,8 @@ urlpatterns = patterns('',
   ('graphlot/', include('graphite.graphlot.urls')),
   ('^version/', include('graphite.version.urls')),
   ('^events/', include('graphite.events.urls')),
+  ('^history?', 'graphite.browser.views.history'),
+  ('^bsdebug?', 'graphite.browser.views.bsdebug'),
   ('', 'graphite.browser.views.browser'),
 )
 
