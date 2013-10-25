@@ -24,15 +24,9 @@ def evaluateTokens(requestContext, tokens):
     return fetchData(requestContext, tokens.pathExpression)
 
   elif tokens.call:
-    try:
-    func = SeriesFunctions[tokens.call.funcname]
+    func = SeriesFunctions[tokens.call.func]
     args = [evaluateTokens(requestContext, arg) for arg in tokens.call.args]
-    kwargs = dict([(kwarg.argname, evaluateTokens(requestContext, kwarg.args[0]))
-                   for kwarg in tokens.call.kwargs])
-    return func(requestContext, *args, **kwargs)
-    except ValueError:
-      log.exception('value error when render') 
-      return []
+    return func(requestContext, *args)
 
   elif tokens.number:
     if tokens.number.integer:
