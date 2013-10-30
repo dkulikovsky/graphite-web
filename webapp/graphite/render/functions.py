@@ -145,7 +145,7 @@ def formatPathExpressions(seriesList):
 def formatPathExpressions_diff_special(seriesList):
    # remove duplicates
    pathExpressions = []
-   [pathExpressions.append(s.pathExpression) for s in seriesList]
+   [pathExpressions.append(s.name) for s in seriesList]
    return ','.join(pathExpressions)
 
 
@@ -2311,7 +2311,7 @@ def timeShift(requestContext, seriesList, timeShift, resetEnd=True):
   results = []
 
   for shiftedSeries in evaluateTarget(myContext, series.pathExpression):
-    shiftedSeries.name = 'timeShift(%s, %s)' % (shiftedSeries.name, timeShift)
+    shiftedSeries.name = 'timeShift(%s, "%s")' % (shiftedSeries.name, timeShift)
     if resetEnd:
       shiftedSeries.end = series.end
     else:
