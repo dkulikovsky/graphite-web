@@ -1,3 +1,5 @@
+{% autoescape off %}
+
 <html>
   <head>
     <title>Graphite Dashboard</title>
@@ -5,10 +7,8 @@
     <link rel="stylesheet" type="text/css" href="/content/css/dashboard.css"/>
 
     <script type="text/javascript">
-    // Be overly cautious to prevent an unlikely XSS (See the below link rule 3.1):
-    // https://www.owasp.org/index.php/XSS_%28Cross_Site_Scripting%29_Prevention_Cheat_Sheet
-    var schemes = JSON.parse('{{ schemes_json|safe }}');
-    var UI_CONFIG = JSON.parse('{{ ui_config_json|safe }}');
+    var schemes = {{schemes_json|safe}};
+    var UI_CONFIG = {{ui_config_json|safe}};
     var CONTEXT_FIELD_WIDTH = 220;
     var AUTOCOMPLETE_DELAY = UI_CONFIG.autocomplete_delay;
     var FINDER_QUERY_DELAY = 100;
@@ -23,19 +23,19 @@
     var HELP_ICON     = '/content/js/ext/resources/icons/fam/information.png';
 
     {% if initialState %}
-    var initialState = "{{ initialState|escapejs }}";
+    var initialState = {{initialState|safe}};
     {% else %}
     var initialState = null;
     {% endif %}
 
     {% if initialError %}
-    var initialError = "{{ initialError|escapejs }}";
+    var initialError = "{{initialError|safe}}";
     {% else %}
     var initialError = null;
     {% endif %}
 
     {% if querystring %}
-    var queryString = JSON.parse('{{ querystring|safe }}');
+    var queryString = {{querystring|safe}};
     {% endif %}
 
     var permissions = JSON.parse('{{ permissions|safe }}');
@@ -50,16 +50,27 @@
     </script>
 
     <!-- Theme overrides -->
-    <link rel="stylesheet" type="text/css" href="/content/css/dashboard-{{ theme }}.css" />
+    <link rel="stylesheet" type="text/css" href="/content/css/dashboard-{{theme}}.css"/>
 
-    <script type="text/javascript" src="/content/js/ext/adapter/ext/ext-base{% if jsdebug %}-debug{% endif %}.js"></script>
-    <script type="text/javascript" src="/content/js/ext/ext-all{% if jsdebug %}-debug{% endif %}.js"></script>
+    {% if jsdebug %}
+    <script type="text/javascript" src="/content/js/ext/adapter/ext/ext-base-debug.js"></script>
+    <script type="text/javascript" src="/content/js/ext/ext-all-debug.js"></script>
     <script type="text/javascript" src="/content/js/ext/ux/DataViewTransition.js"></script>
     <script type="text/javascript" src="/content/js/composer_widgets.js"></script>
     <script type="text/javascript" src="/content/js/dashboard.js"></script>
     <script type="text/javascript" src="/content/js/ace/ace.js"></script>
     <script type="text/javascript" src="/content/js/ace/mode-json.js"></script>
     <script type="text/javascript" src="/content/js/ace/theme-textmate.js"></script>
+    {% else %}
+    <script type="text/javascript" src="/content/js/ext/adapter/ext/ext-base.js"></script>
+    <script type="text/javascript" src="/content/js/ext/ext-all.js"></script>
+    <script type="text/javascript" src="/content/js/ext/ux/DataViewTransition.js"></script>
+    <script type="text/javascript" src="/content/js/composer_widgets.js"></script>
+    <script type="text/javascript" src="/content/js/dashboard.js"></script>
+    <script type="text/javascript" src="/content/js/ace/ace.js"></script>
+    <script type="text/javascript" src="/content/js/ace/mode-json.js"></script>
+    <script type="text/javascript" src="/content/js/ace/theme-textmate.js"></script>
+    {% endif %}
 
     <script type="text/javascript">
     Ext.BLANK_IMAGE_URL = '/content/js/ext/resources/images/default/s.gif';
@@ -72,3 +83,5 @@
     <div id='merge'>Drop To Merge</div>
   </body>
 </html>
+
+{% endautoescape %}
