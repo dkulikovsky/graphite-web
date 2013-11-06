@@ -30,6 +30,10 @@ defaultUIConfig = {
 }
 defaultKeyboardShortcuts = {
   'open_finder' : 'alt-a',
+  'time_range_1_hours': 'alt-shift-1',
+  'time_range_6_hours': 'alt-shift-2',
+  'time_range_1_day': 'alt-shift-3',
+  'time_range_1_week': 'alt-shift-4',
   'toggle_toolbar' : 'ctrl-z',
   'toggle_metrics_panel' : 'ctrl-space',
   'erase_all_graphs' : 'alt-x',

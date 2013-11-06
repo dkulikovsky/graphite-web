@@ -600,7 +600,7 @@ function initDashboard () {
 		}
       },
 	  click: {
-        fn: function(graphView, graphIndex, element, evt) {
+	    fn: function(graphView, graphIndex, element, evt) {
           if (new Date() - lastDragEvent < 500)
             return;
           var record = element.querySelector('img');
@@ -1308,6 +1308,41 @@ function timeRangeUpdated() {
   refreshGraphs();
 }
 
+function updateTimeRange_1hours_before() {
+  TimeRange.type = 'relative';
+  TimeRange.relativeStartQuantity = "1";
+  TimeRange.relativeStartUnits = "hours";
+  TimeRange.relativeUntilQuantity = "";
+  TimeRange.relativeUntilUnits = "now";
+  timeRangeUpdated();
+}
+
+function updateTimeRange_6hours_before() {
+  TimeRange.type = 'relative';
+  TimeRange.relativeStartQuantity = "6";
+  TimeRange.relativeStartUnits = "hours";
+  TimeRange.relativeUntilQuantity = "";
+  TimeRange.relativeUntilUnits = "now";
+  timeRangeUpdated();
+}
+
+function updateTimeRange_1day_before() {
+  TimeRange.type = 'relative';
+  TimeRange.relativeStartQuantity = "1";
+  TimeRange.relativeStartUnits = "day";
+  TimeRange.relativeUntilQuantity = "";
+  TimeRange.relativeUntilUnits = "now";
+  timeRangeUpdated();
+}
+
+function updateTimeRange_1week_before() {
+  TimeRange.type = 'relative';
+  TimeRange.relativeStartQuantity = "1";
+  TimeRange.relativeStartUnits = "week";
+  TimeRange.relativeUntilQuantity = "";
+  TimeRange.relativeUntilUnits = "now";
+  timeRangeUpdated();
+}
 
 function selectRelativeTime() {
   var quantityField = new Ext.form.TextField({
@@ -1548,7 +1583,7 @@ function newFromSavedGraph() {
   function handleSelects(selModel, nodes) {
     Ext.each(nodes, function (node, index) {
       if (!node.leaf) {
-        node.unselect();
+	node.unselect();
         node.toggle();
       }
     });
@@ -2385,6 +2420,10 @@ var keyEventHandlers = (function() {
   return {
   toggle_toolbar: toggleToolbar,
   open_finder: showDashboardFinder,
+  time_range_1_hours: updateTimeRange_1hours_before, 
+  time_range_6_hours: updateTimeRange_6hours_before, 
+  time_range_1_day: updateTimeRange_1day_before, 
+  time_range_1_week: updateTimeRange_1week_before, 
   toggle_metrics_panel: toggleNavBar,
   give_completer_focus: focusCompleter,
   erase_all_graphs: function () {
@@ -2787,7 +2826,7 @@ function showDashboardFinder() {
     listeners: {
       beforeload: function (store) {
                     store.setBaseParam('query', queryField.getValue());
-      }
+                  }
     }
   });
 
@@ -3146,12 +3185,13 @@ function showLoginForm() {
         allowBlank: false
       }
     ],
+
     buttons: [
       {text: 'Login', formBind: true, handler: doLogin},
       {text: 'Cancel', handler: function () { win.close(); } }
     ]
   });
-  
+
   function doLogin() {
     login.getForm().submit({
       method: 'POST',
