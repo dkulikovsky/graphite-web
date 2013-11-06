@@ -124,7 +124,7 @@ def renderView(request):
         data.extend(seriesList)
 
     if useCache:
-      cache.set(dataKey, data, cacheTimeout)
+      cache.add(dataKey, data, cacheTimeout)
 
     # If data is all we needed, we're done
     format = requestOptions.get('format')
