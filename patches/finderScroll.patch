@@ -1,0 +1,10 @@
+--- webapp/content/js/dashboard.js	2013-07-31 15:03:13.389909336 +0400
++++ /var/lib/graphite/webapp/content/js/dashboard.js	2013-07-31 15:36:03.746676546 +0400
+@@ -2363,6 +2363,7 @@
+         sel = sel + d;
+         if (sel < 0) sel = 0; else if (sel > last) sel = last;
+         cmp.select(sel);
++        cmp.selected.elements[0].scrollIntoView();
+       }
+     };
+   };

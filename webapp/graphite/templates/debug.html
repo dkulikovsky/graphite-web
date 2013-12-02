@@ -1,0 +1,11 @@
+<html>
+<head>
+        <title>Graphite {{ purpose }}</title>
+</head>
+  <body align="center">
+    {% for graph in views %}
+      <h3>{{ graph.0 }}</h3><br>
+      <img src="http://bsgraphite.yandex.ru/render?{{ graph.1 }}"></img>
+    {% endfor %}
+  </body>
+</html>

@@ -1,0 +1,11 @@
+<html>
+<head>
+        <title>Graphite history</title>
+</head>
+  <body align="center">
+    {% for graph in views %}
+      <h3>{{ graph.0 }}</h3><br>
+      <img src="http://{{ graph.2 }}/render?{{ graph.1 }}"></img>
+    {% endfor %}
+  </body>
+</html>
