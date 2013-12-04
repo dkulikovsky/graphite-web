@@ -1,0 +1,39 @@
+Index: webapp/graphite/render/functions.py
+===================================================================
+--- webapp/graphite/render/functions.py	(revision 6362)
++++ webapp/graphite/render/functions.py	(revision 6365)
+@@ -773,6 +774,26 @@
+     series.name = 'consolidateBy(%s,"%s")' % (series.name, series.consolidationFunc)
+   return seriesList
+ 
++def yabsDerivative(requestContext, seriesList):
++  results = []
++  for series in seriesList:
++    newValues = []
++    prev = None
++    for val in series:
++      if None in (prev, val):
++        newValues.append(None)
++      else:
++        newValues.append(val - prev)
++        prev = val
++
++      if prev is None: prev = val
++
++    newName = "yabsDerivative(%s)" % series.name
++    newSeries = TimeSeries(newName, series.start, series.end, series.step, newValues)
++    newSeries.pathExpression = newName
++    results.append(newSeries)
++  return results
++
+ def derivative(requestContext, seriesList):
+   """
+   This is the opposite of the integral function.  This is useful for taking a
+@@ -2793,6 +2814,7 @@
+   'offset' : offset,
+   'derivative' : derivative,
+   'perSecond' : perSecond,
++  'yabsDerivative' : yabsDerivative,
+   'integral' : integral,
+   'percentileOfSeries': percentileOfSeries,
+   'nonNegativeDerivative' : nonNegativeDerivative,

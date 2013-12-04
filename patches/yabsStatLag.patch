@@ -1,0 +1,44 @@
+Index: webapp/graphite/render/functions.py
+===================================================================
+--- webapp/graphite/render/functions.py	(revision 6360)
++++ webapp/graphite/render/functions.py	(working copy)
+@@ -2622,6 +2622,31 @@
+ 
+   return [series]
+ 
++
++def yabsStatLag(requestContext, seriesList):
++  results = []
++  for series in seriesList:
++    step = series.step
++    delta = timedelta(seconds=step)
++    when = requestContext["startTime"]
++    newValues = []
++    i = 0
++
++    while when < requestContext["endTime"]:
++      if series[i] != None:
++        newValues.append(time.mktime(when.timetuple()) - series[i])
++      else:
++        newValues.append(None)
++      i += 1
++      when += delta
++
++    newName = "yabsStatLag(%s)" % series.name
++    newSeries = TimeSeries(newName, series.start, series.end, series.step, newValues)
++    newSeries.pathExpression = newName
++    results.append(newSeries)
++  return results
++
++
+ def sinFunction(requestContext, name, amplitude=1):
+   """
+   Short Alias: sin()
+@@ -2791,6 +2816,7 @@
+   'pct' : asPercent,
+   'diffSeries' : diffSeries,
+   'divideSeries' : divideSeries,
++  'yabsStatLag' : yabsStatLag,
+ 
+   # Series Filter functions
+   'mostDeviant' : mostDeviant,

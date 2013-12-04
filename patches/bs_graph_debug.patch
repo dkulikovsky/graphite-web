@@ -1,0 +1,86 @@
+Index: content/js/dashboard.js
+===================================================================
+--- content/js/dashboard.js	(revision 6688)
++++ content/js/dashboard.js	(working copy)
+@@ -1977,6 +1977,12 @@
+     }, {
+       xtype: 'button',
+       fieldLabel: "<span style='visibility: hidden'>",
++      text: 'Graph debug',
++      width: 100,
++      handler: function () { menu.destroy(); window.open('/bsdebug' + record.data.url.replace('/render',''),'_blank'); }
++    }, {
++      xtype: 'button',
++      fieldLabel: "<span style='visibility: hidden'>",
+       text: 'Email',
+       width: 100,
+       handler: function () { menu.destroy(); mailGraph(record); }
+Index: graphite/urls.py
+===================================================================
+--- graphite/urls.py	(revision 6688)
++++ graphite/urls.py	(working copy)
+@@ -33,6 +33,7 @@
+   ('^version/', include('graphite.version.urls')),
+   ('^events/', include('graphite.events.urls')),
+   ('^history?', 'graphite.browser.views.history'),
++  ('^bsdebug?', 'graphite.browser.views.bsdebug'),
+   ('', 'graphite.browser.views.browser'),
+ )
+ 
+Index: graphite/browser/urls.py
+===================================================================
+--- graphite/browser/urls.py	(revision 6688)
++++ graphite/browser/urls.py	(working copy)
+@@ -20,5 +20,6 @@
+   ('^mygraph/?$', 'myGraphLookup'),
+   ('^usergraph/?$', 'userGraphLookup'),
+   ('^history', 'history'),
++  ('^bsdebug', 'bsdebug'),
+   ('^$', 'browser'),
+ )
+Index: graphite/browser/views.py
+===================================================================
+--- graphite/browser/views.py	(revision 6688)
++++ graphite/browser/views.py	(working copy)
+@@ -43,12 +43,27 @@
+   query = re.sub(r'width=[0-9]+','width=800', query)
+   query = re.sub(r'height=[0-9]+','height=350', query)
+   for key in view_dict:
+-    views.append( (key[0], re.sub(r'from=.*?&',"from=-%s&" % key[1], query)) )
++    views.append( (key[0], re.sub(r'from=.*?&',"from=-%s&" % key[1], query), "bsgraphite.yandex.ru") )
+   log.info("DEBUG: views = %s" % views)
+   context = {}
+   context['views'] = views
++  context['purpose'] = "history"
+   return render_to_response("history.html", context)
+ 
++def bsdebug(request):
++  query = request.GET.urlencode()
++  views = []
++  query = re.sub(r'width=[0-9]+','width=800', query)
++  query = re.sub(r'height=[0-9]+','height=350', query)
++  bsgraphite_arr = [ "1-01g", "1-02g", "1-01e", "1-02e", "1-01h", "1-02h" ]
++  for host in bsgraphite_arr:
++    views.append( (host, query, "bsgraphite%s.yandex.ru" % host) )
++  context = {}
++  context['views'] = views
++  context['purpose'] = "debug"
++  return render_to_response("history.html", context)
++
++   
+ def header(request):
+   "View for the header frame of the browser UI"
+   context = {}
+Index: graphite/templates/history.html
+===================================================================
+--- graphite/templates/history.html	(revision 6688)
++++ graphite/templates/history.html	(working copy)
+@@ -5,7 +5,7 @@
+   <body align="center">
+     {% for graph in views %}
+       <h3>{{ graph.0 }}</h3><br>
+-      <img src="http://bsgraphite.yandex.ru/render?{{ graph.1 }}"></img>
++      <img src="http://{{ graph.2 }}/render?{{ graph.1 }}"></img>
+     {% endfor %}
+   </body>
+ </html>
