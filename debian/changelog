@@ -1,5 +1,336 @@
-graphite-web (0.1.9.8) unstable; urgency=low
+yabs-graphite-ceres (0.2.0.23) unstable; urgency=low
 
-  * moved to git
+  * depends fix
 
- -- Kulikovsky Dmitry <dkulikovsky@yandex-team.ru>  Fri, 30 Sep 2013 12:19:19 +0400
+ -- Anna Sysoeva <antrue@yandex-team.ru>  Wed, 20 Nov 2013 21:11:16 +0400
+
+yabs-graphite-ceres (0.2.0.22) unstable; urgency=low
+
+  * depends fix
+
+ -- Anna Sysoeva <antrue@yandex-team.ru>  Wed, 20 Nov 2013 20:59:24 +0400
+
+yabs-graphite-ceres (0.2.0.21) unstable; urgency=low
+
+  * django versions fix
+
+ -- Anna Sysoeva <antrue@yandex-team.ru>  Wed, 20 Nov 2013 20:55:57 +0400
+
+yabs-graphite-ceres (0.2.0.20) unstable; urgency=low
+
+  * django versions fix
+
+ -- Anna Sysoeva <antrue@yandex-team.ru>  Wed, 20 Nov 2013 20:50:09 +0400
+
+yabs-graphite-ceres (0.2.0.19) unstable; urgency=low
+
+  * depends on django fixed
+
+ -- Anna Sysoeva <antrue@yandex-team.ru>  Wed, 20 Nov 2013 20:32:12 +0400
+
+yabs-graphite-ceres (0.2.0.18) unstable; urgency=low
+
+  * depends fixed 
+
+ -- Anna Sysoeva <antrue@yandex-team.ru>  Wed, 20 Nov 2013 20:27:56 +0400
+
+yabs-graphite-ceres (0.2.0.17) unstable; urgency=low
+
+  * logrotate removed, moved to yabs-graphite-ceres-config 
+
+ -- Anna Sysoeva <antrue@yandex-team.ru>  Wed, 20 Nov 2013 14:42:51 +0400
+
+yabs-graphite-ceres (0.2.0.16) unstable; urgency=low
+
+  * rollup logging switched off
+
+ -- Anna Sysoeva <antrue@yandex-team.ru>  Wed, 06 Nov 2013 18:33:44 +0400
+
+yabs-graphite-ceres (0.2.0.15) precise; urgency=low
+
+  * read metadata only once in rollup
+  * print broken metrics (broken .ceres-node json) to log 
+
+ -- Kirill Zhalnin <kiwi@yandex-team.ru>  Fri, 15 Nov 2013 18:47:24 +0400
+
+yabs-graphite-ceres (0.2.0.14) precise; urgency=low
+
+  * removed bad depend for python-django-1.5 
+
+ -- Kulikovsky Dmitry <dkulikovsky@yandex-team.ru>  Wed, 13 Nov 2013 14:36:01 +0400
+
+yabs-graphite-ceres (0.2.0.13) precise; urgency=low
+
+  * fixed shorcuts+zoom bug
+  * made djandgo depend more universal
+
+ -- Kulikovsky Dmitry <dkulikovsky@yandex-team.ru>  Wed, 13 Nov 2013 14:28:23 +0400
+
+yabs-graphite-ceres (0.2.0.12) precise; urgency=low
+
+  * rollup stat to ceres_rollup.err 
+
+ -- Kirill Zhalnin <kiwi@yandex-team.ru>  Thu, 07 Nov 2013 21:00:33 +0400
+
+yabs-graphite-ceres (0.2.0.11) precise; urgency=low
+
+  * rollup logrotate 
+
+ -- Kirill Zhalnin <kiwi@yandex-team.ru>  Thu, 07 Nov 2013 17:02:52 +0400
+
+yabs-graphite-ceres (0.2.0.10) precise; urgency=low
+
+  * new rollup
+
+ -- Kirill Zhalnin <kiwi@yandex-team.ru>  Thu, 07 Nov 2013 16:40:22 +0400
+
+yabs-graphite-ceres (0.2.0.9) precise; urgency=low
+
+  * fixed dashboards links
+
+ -- Kulikovsky Dmitry <dkulikovsky@yandex-team.ru>  Wed, 06 Nov 2013 17:39:13 +0400
+
+yabs-graphite-ceres (0.2.0.8) unstable; urgency=low
+
+  * added shortcuts for timeRange periods
+
+ -- Kulikovsky Dmitry <dkulikovsky@yandex-team.ru>  Wed, 06 Nov 2013 15:14:06 +0400
+
+yabs-graphite-ceres (0.2.0.7) unstable; urgency=low
+
+  * fixed series name output for diffSeries
+
+ -- Kulikovsky Dmitry <dkulikovsky@yandex-team.ru>  Wed, 30 Oct 2013 18:16:52 +0400
+
+yabs-graphite-ceres (0.2.0.6) unstable; urgency=low
+
+  * fixed sort order in finder
+
+ -- Kulikovsky Dmitry <dkulikovsky@yandex-team.ru>  Tue, 29 Oct 2013 13:48:43 +0400
+
+>>>>>>> .r7382
+yabs-graphite-ceres (0.2.0.5) unstable; urgency=low
+
+  * merged to trunk 
+
+ -- Kulikovsky Dmitry <dkulikovsky@yandex-team.ru>  Mon, 28 Oct 2013 15:03:24 +0400
+
+yabs-graphite-ceres (0.2.0.4) unstable; urgency=low
+
+  * fixed icons place 
+
+ -- Kulikovsky Dmitry <dkulikovsky@yandex-team.ru>  Mon, 28 Oct 2013 14:13:48 +0400
+
+yabs-graphite-ceres (0.2.0.3) precise; urgency=low
+
+  * reverted bad patch
+
+ -- Kulikovsky Dmitry <dkulikovsky@yandex-team.ru>  Fri, 25 Oct 2013 13:40:26 +0400
+
+yabs-graphite-ceres (0.2.0.2) unstable; urgency=low
+
+  * fixed some bugs 
+
+ -- Kulikovsky Dmitry <dkulikovsky@yandex-team.ru>  Thu, 24 Oct 2013 19:52:22 +0400
+
+yabs-graphite-ceres (0.2.0.1) unstable; urgency=low
+
+  * added correts deps 
+
+ -- Kulikovsky Dmitry <dkulikovsky@yandex-team.ru>  Thu, 24 Oct 2013 19:43:06 +0400
+
+yabs-graphite-ceres (0.2.0.0) unstable; urgency=low
+
+  * merged with graphite trunk 
+
+ -- Kulikovsky Dmitry <dkulikovsky@yandex-team.ru>  Thu, 24 Oct 2013 18:08:57 +0400
+
+yabs-graphite-ceres (0.1.9.12) unstable; urgency=low
+
+  [ Kulikovsky Dmitry ]
+  * fixed braces bug 
+
+  [ Vladimir Eremin ]
+  * extended fix
+
+ -- Vladimir Eremin <yottatsa@yandex-team.ru>  Tue, 22 Oct 2013 18:08:23 +0400
+
+yabs-graphite-ceres (0.1.9.10) unstable; urgency=low
+
+  * RTADMIN-5976 normalize
+
+ -- Vladimir Eremin <yottatsa@yandex-team.ru>  Sun, 20 Oct 2013 20:55:33 +0400
+
+yabs-graphite-ceres (0.1.9.9) unstable; urgency=low
+
+  * added bsgraphite1-03h to views 
+
+ -- Anna Sysoeva <antrue@yandex-team.ru>  Wed, 16 Oct 2013 17:07:47 +0400
+
+yabs-graphite-ceres (0.1.9.8) unstable; urgency=low
+
+  * fixed possible loop
+
+ -- Kulikovsky Dmitry <dkulikovsky@yandex-team.ru>  Fri, 20 Sep 2013 19:19:19 +0400
+
+yabs-graphite-ceres (0.1.9.7) unstable; urgency=low
+
+  * changed python-pytz to python-tz in deplist 
+
+ -- Anna Sysoeva <antrue@yandex-team.ru>  Mon, 16 Sep 2013 14:12:59 +0400
+
+yabs-graphite-ceres (0.1.9.6) unstable; urgency=low
+
+  * json_render rethink, applied
+
+ -- Vladimir Eremin <yottatsa@yandex-team.ru>  Tue, 10 Sep 2013 16:36:09 +0400
+
+yabs-graphite-ceres (0.1.9.5) unstable; urgency=low
+
+  * applied rollup patch
+
+ -- Kulikovsky Dmitry <dkulikovsky@yandex-team.ru>  Tue, 03 Sep 2013 15:06:18 +0400
+
+yabs-graphite-ceres (0.1.9.4) unstable; urgency=low
+
+  * fixed statLag bug
+
+ -- Kulikovsky Dmitry <dkulikovsky@yandex-team.ru>  Tue, 03 Sep 2013 14:55:17 +0400
+
+yabs-graphite-ceres (0.1.9.3) unstable; urgency=low
+
+  * fixed rollup for very old datapoints
+
+ -- Kulikovsky Dmitry <dkulikovsky@yandex-team.ru>  Thu, 29 Aug 2013 18:47:46 +0400
+
+yabs-graphite-ceres (0.1.9.2) precise; urgency=low
+
+  * added special formatPath function for diffSeries
+
+ -- Kulikovsky Dmitry <dkulikovsky@yandex-team.ru>  Wed, 28 Aug 2013 15:26:46 +0400
+
+yabs-graphite-ceres (0.1.9.1) unstable; urgency=low
+
+  * added graph debug button
+
+ -- Kulikovsky Dmitry <dkulikovsky@yandex-team.ru>  Thu, 22 Aug 2013 14:05:54 +0400
+
+yabs-graphite-ceres (0.1.8.9) unstable; urgency=low
+
+  * fixed history url to bsgraphite.yandex.ru
+
+ -- Kulikovsky Dmitry <dkulikovsky@yandex-team.ru>  Wed, 21 Aug 2013 18:45:12 +0400
+
+yabs-graphite-ceres (0.1.8.8) precise; urgency=low
+
+  * removed postinst
+
+ -- Kulikovsky Dmitry <dkulikovsky@yandex-team.ru>  Wed, 14 Aug 2013 20:58:32 +0400
+
+yabs-graphite-ceres (0.1.8.7) precise; urgency=low
+
+  * fixed postinst 
+
+ -- Kulikovsky Dmitry <dkulikovsky@yandex-team.ru>  Wed, 14 Aug 2013 20:45:47 +0400
+
+yabs-graphite-ceres (0.1.8.5) precise; urgency=low
+
+  * added chown to postinst
+
+ -- Kulikovsky Dmitry <dkulikovsky@yandex-team.ru>  Wed, 14 Aug 2013 20:23:48 +0400
+
+yabs-graphite-ceres (0.1.8.4) precise; urgency=low
+
+  * added 1day interval
+
+ -- Kulikovsky Dmitry <dkulikovsky@yandex-team.ru>  Mon, 05 Aug 2013 17:50:00 +0400
+
+yabs-graphite-ceres (0.1.8.3) precise; urgency=low
+
+  * added missing template
+
+ -- Kulikovsky Dmitry <dkulikovsky@yandex-team.ru>  Mon, 05 Aug 2013 17:47:08 +0400
+
+yabs-graphite-ceres (0.1.8.2) unstable; urgency=low
+
+  * added history page 
+
+ -- Kulikovsky Dmitry <dkulikovsky@yandex-team.ru>  Mon, 05 Aug 2013 17:43:45 +0400
+
+yabs-graphite-ceres (0.1.8.1) unstable; urgency=low
+
+  * fixed installation of plugins
+
+ -- Kulikovsky Dmitry <dkulikovsky@yandex-team.ru>  Fri, 02 Aug 2013 13:13:46 +0400
+
+yabs-graphite-ceres (0.1.8) precise; urgency=low
+
+  * applied fix for rollup
+
+ -- Kulikovsky Dmitry <dkulikovsky@yandex-team.ru>  Thu, 01 Aug 2013 18:19:48 +0400
+
+yabs-graphite-ceres (0.1.7.3) precise; urgency=low
+
+  * float in cactiStyle
+
+ -- Kulikovsky Dmitry <dkulikovsky@yandex-team.ru>  Wed, 31 Jul 2013 18:23:33 +0400
+
+yabs-graphite-ceres (0.1.7.2) precise; urgency=low
+
+  * fixed scrolling
+
+ -- Kulikovsky Dmitry <dkulikovsky@yandex-team.ru>  Wed, 31 Jul 2013 15:38:23 +0400
+
+yabs-graphite-ceres (0.1.7.1) precise; urgency=low
+
+  * fixed dashboard/view.py
+
+ -- Kulikovsky Dmitry <dkulikovsky@yandex-team.ru>  Wed, 31 Jul 2013 15:31:27 +0400
+
+yabs-graphite-ceres (0.1.7) precise; urgency=low
+
+  * added some fixes for dashboard
+
+ -- Kulikovsky Dmitry <dkulikovsky@yandex-team.ru>  Wed, 31 Jul 2013 15:06:40 +0400
+
+yabs-graphite-ceres (0.1.6) unstable; urgency=low
+
+  * navBar collapsed by default 
+
+ -- Kulikovsky Dmitry <dkulikovsky@yandex-team.ru>  Tue, 30 Jul 2013 23:40:33 +0400
+
+yabs-graphite-ceres (0.1.5) unstable; urgency=low
+
+  * added graphPlot link in dashboard menu 
+
+ -- Kulikovsky Dmitry <dkulikovsky@yandex-team.ru>  Tue, 30 Jul 2013 14:19:28 +0400
+
+yabs-graphite-ceres (0.1.4) unstable; urgency=low
+
+  * reverted json_render patch 
+
+ -- Kulikovsky Dmitry <dkulikovsky@yandex-team.ru>  Thu, 18 Jul 2013 15:18:16 +0400
+
+yabs-graphite-ceres (0.1.3) unstable; urgency=low
+
+  * applied bsgraphite patches 
+
+ -- Kulikovsky Dmitry <dkulikovsky@yandex-team.ru>  Tue, 16 Jul 2013 18:14:32 +0400
+
+yabs-graphite-ceres (0.1.2) precise; urgency=low
+
+  * defaultTemplate must be stripped
+
+ -- Kulikovsky Dmitry <dkulikovsky@yandex-team.ru>  Wed, 10 Jul 2013 16:02:02 +0400
+
+yabs-graphite-ceres (0.1.1) unstable; urgency=low
+
+  * added custom field defaultTemplate in user profile 
+
+ -- Kulikovsky Dmitry <dkulikovsky@yandex-team.ru>  Wed, 10 Jul 2013 15:44:40 +0400
+
+yabs-graphite-ceres (0.1) unstable; urgency=low
+
+  * Initial Release.
+
+ -- Anna Sysoeva <antrue@yandex-team.ru>  Thu, 04 Jul 2013 18:49:48 +0400

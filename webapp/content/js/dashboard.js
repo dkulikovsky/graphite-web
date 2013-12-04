@@ -600,7 +600,7 @@ function initDashboard () {
 		}
       },
 	  click: {
-	    fn: function(graphView, graphIndex, element, evt) {
+        fn: function(graphView, graphIndex, element, evt) {
           if (new Date() - lastDragEvent < 500)
             return;
           var record = element.querySelector('img');
@@ -1329,7 +1329,7 @@ function updateTimeRange_6hours_before() {
 function updateTimeRange_1day_before() {
   TimeRange.type = 'relative';
   TimeRange.relativeStartQuantity = "1";
-  TimeRange.relativeStartUnits = "day";
+  TimeRange.relativeStartUnits = "days";
   TimeRange.relativeUntilQuantity = "";
   TimeRange.relativeUntilUnits = "now";
   timeRangeUpdated();
@@ -1338,7 +1338,7 @@ function updateTimeRange_1day_before() {
 function updateTimeRange_1week_before() {
   TimeRange.type = 'relative';
   TimeRange.relativeStartQuantity = "1";
-  TimeRange.relativeStartUnits = "week";
+  TimeRange.relativeStartUnits = "weeks";
   TimeRange.relativeUntilQuantity = "";
   TimeRange.relativeUntilUnits = "now";
   timeRangeUpdated();
@@ -1583,7 +1583,7 @@ function newFromSavedGraph() {
   function handleSelects(selModel, nodes) {
     Ext.each(nodes, function (node, index) {
       if (!node.leaf) {
-	node.unselect();
+        node.unselect();
         node.toggle();
       }
     });
@@ -2821,12 +2821,12 @@ function showDashboardFinder() {
     root: 'dashboards',
     sortInfo: {
       field: 'name',
-      direction: 'DESC'
+      direction: 'ASC'
     },
     listeners: {
       beforeload: function (store) {
                     store.setBaseParam('query', queryField.getValue());
-                  }
+      }
     }
   });
 
@@ -3185,13 +3185,12 @@ function showLoginForm() {
         allowBlank: false
       }
     ],
-
     buttons: [
       {text: 'Login', formBind: true, handler: doLogin},
       {text: 'Cancel', handler: function () { win.close(); } }
     ]
   });
-
+  
   function doLogin() {
     login.getForm().submit({
       method: 'POST',

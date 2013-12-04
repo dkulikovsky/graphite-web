@@ -1,14 +1,21 @@
-Source: graphite-web
+Source: yabs-graphite-ceres
 Section: misc
 Priority: extra
-Maintainer: Kulikovsky Dmitry <dkulikovsky@yandex.ru>
-Build-Depends: debhelper (>= 8.0.0), cdbs, python-support
+Maintainer: Anna Sysoeva <antrue@yandex-team.ru>
+Build-Depends: debhelper (>= 8.0.0), cdbs
 Standards-Version: 3.9.3
 Homepage: http://github.com/graphite-project/
 
-Package: graphite-web
+Package: yabs-graphite-ceres
 Architecture: all
-Depends: ${shlibs:Depends}, ${misc:Depends}, 
-	python-cairo, python-tz, python-pyparsing, python-django-tagging, python-mysqldb, mysql-server, python-flup, haproxy
+Depends: python-cairo, 
+ python-tz, 
+ python-pyparsing, 
+ python-django-1.4 | python-django (>= 1.4) | python-django-1.6, 
+ python-django-tagging, 
+ python-mysqldb, 
+ config-yabs-nginx-http, 
+ mysql-server, 
+ python-flup
 Description: graph system uses ceres
  New graph system uses ceres
