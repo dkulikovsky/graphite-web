@@ -1,3 +1,9 @@
+yabs-graphite-ceres (0.2.0.25) precise; urgency=low
+
+  * added construct button in dashboard
+
+ -- Kulikovsky Dmitry <dkulikovsky@yandex-team.ru>  Wed, 04 Dec 2013 23:38:20 +0400
+
 yabs-graphite-ceres (0.2.0.24) unstable; urgency=low
 
   * moved to github
