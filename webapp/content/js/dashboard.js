@@ -2009,6 +2009,12 @@ function graphClicked(graphIndex, evt) {
     }, {
       xtype: 'button',
       fieldLabel: "<span style='visibility: hidden'>",
+      text: 'Construct',
+      width: 100,
+      handler: function () { menu.destroy(); window.open('/composer/?showTarget=' + record.data.url.replace('/render',''),'_blank'); }
+    }, {
+      xtype: 'button',
+      fieldLabel: "<span style='visibility: hidden'>",
       text: 'History',
       width: 100,
       handler: function () { menu.destroy(); window.open('/history' + record.data.url.replace('/render',''),'_blank'); }
