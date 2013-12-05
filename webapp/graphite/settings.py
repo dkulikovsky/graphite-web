@@ -43,6 +43,8 @@ WHISPER_DIR = ''
 RRD_DIR = ''
 STANDARD_DIRS = []
 
+CLUSTER_SERVERS = []
+
 # Cluster settings
 CLUSTER_SERVERS = []
 REMOTE_FIND_TIMEOUT = 3.0
