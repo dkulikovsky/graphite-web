@@ -31,7 +31,9 @@ def braces_glob(s):
 
 
 class CeresFinder:
-  def __init__(self, directory):
+  def __init__(self, directory=None):
+    if directory is None:
+      directory = settings.CERES_DIR
     self.directory = directory
     self.tree = CeresTree(directory)
 
@@ -54,7 +56,9 @@ class CeresFinder:
 class StandardFinder:
   DATASOURCE_DELIMETER = '::RRD_DATASOURCE::'
 
-  def __init__(self, directories):
+  def __init__(self, directories=None):
+    if directories is None:
+      directories = settings.STANDARD_DIRS
     self.directories = directories
 
   def find_nodes(self, query):
