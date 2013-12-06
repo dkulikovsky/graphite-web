@@ -14,7 +14,6 @@ Depends: python-cairo,
  python-django-1.4 | python-django (>= 1.4) | python-django-1.6, 
  python-django-tagging, 
  python-mysqldb, 
- config-yabs-nginx-http, 
  mysql-server, 
  python-flup
 Description: graph system uses ceres
