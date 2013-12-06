@@ -1,3 +1,9 @@
+yabs-graphite-ceres (0.2.0.26) unstable; urgency=low
+
+  * removed useless files in opt
+
+ -- Kulikovsky Dmitry <dkulikovsky@yandex-team.ru>  Fri, 06 Dec 2013 13:57:22 +0400
+
 yabs-graphite-ceres (0.2.0.25) precise; urgency=low
 
   * added construct button in dashboard
