@@ -222,6 +222,11 @@ Pencil
 `Pencil`_ is a monitoring frontend for graphite. It runs a webserver that dishes out pretty Graphite
 URLs in interesting and intuitive layouts.
 
+pipe-to-graphite
+----------------
+
+`pipe-to-graphite`_ is a small shell script that makes it easy to report the
+output of any other cli program to Graphite.
 
 Rocksteady
 ----------
@@ -327,6 +332,7 @@ txCarbonClient
 .. _metrics-sampler: https://github.com/dimovelev/metrics-sampler
 .. _New Relic: https://newrelic.com/platform
 .. _Pencil: https://github.com/fetep/pencil
+.. _pipe-to-graphite: https://github.com/iFixit/pipe-to-graphite
 .. _RabbitMQ: http://www.rabbitmq.com/
 .. _Rickshaw: http://code.shutterstock.com/rickshaw/
 .. _Rocksteady: http://code.google.com/p/rocksteady/
