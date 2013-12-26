@@ -15,20 +15,22 @@ div.graph-overlay {
 
 div.overlay-close-button {
   position: absolute;
-  top: -5px;
-  right: -5px;
-  background-color: #faa;
-  color: #922;
+  top: 0;
+  right: 0;
+  background-color: rgb(140,140,255);
+  color: #fff;
   font-family: monospace;
-  font-size: 8pt;
+  font-size: 50px;
   font-weight: bold;
   text-align: center;
-  width: 15px;
-  height: 15px;
-  border-radius:         5px;
-  -moz-border-radius:    5px;
-  -webkit-border-radius: 5px;
-  -khtml-border-radius:  5px;
+  width: 48px;
+  height: 48px;
+  -moz-border-radius: 0 5px;
+  -webkit-border-radius: 0 5px;
+  -khtml-border-radius: 0 5px;
+  border-radius: 0 5px;
+  line-height: 53px;
+  cursor: pointer;
 }
 
 img.graph-img {
