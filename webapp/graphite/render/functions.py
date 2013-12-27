@@ -128,6 +128,8 @@ def lcm(a, b):
 
 def normalize(seriesLists):
   seriesList = reduce(lambda L1,L2: L1+L2,seriesLists)
+  if len(seriesList) == 0:
+    raise ValueError('empty series list')
   step = reduce(lcm,[s.step for s in seriesList])
   for s in seriesList:
     s.consolidate( step / s.step )
@@ -487,7 +489,7 @@ def divideSeries(requestContext, dividendSeriesList, divisorSeriesList):
 
 
   """
-  if len(divisorSeriesList) != 1:
+  if len(divisorSeriesList) != 1 or len(dividendSeriesList) != 1:
     raise ValueError("divideSeries second argument must reference exactly 1 series")
 
   divisorSeries = divisorSeriesList[0]
