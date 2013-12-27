@@ -1,9 +1,3 @@
-yabs-graphite-ceres (0.2.0.28) unstable; urgency=low
-
-  * log ValueErrors and continue
-
- -- Vladimir Eremin <yottatsa@yandex-team.ru>  Fri, 27 Dec 2013 11:48:11 +0400
-
 yabs-graphite-ceres (0.2.0.27) unstable; urgency=low
 
   * removed nginx dep
