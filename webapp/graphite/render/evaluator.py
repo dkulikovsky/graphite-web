@@ -24,9 +24,13 @@ def evaluateTokens(requestContext, tokens):
     return fetchData(requestContext, tokens.pathExpression)
 
   elif tokens.call:
-    func = SeriesFunctions[tokens.call.func]
-    args = [evaluateTokens(requestContext, arg) for arg in tokens.call.args]
-    return func(requestContext, *args)
+    try:
+      func = SeriesFunctions[tokens.call.func]
+      args = [evaluateTokens(requestContext, arg) for arg in tokens.call.args]
+      return func(requestContext, *args)
+    except ValueError:
+      log.exception('value error when render') 
+      return []
 
   elif tokens.number:
     if tokens.number.integer:
