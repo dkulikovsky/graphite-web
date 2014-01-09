@@ -1,3 +1,9 @@
+yabs-graphite-ceres (0.2.1.1) unstable; urgency=low
+
+  * reduced size of fonts in menu
+
+ -- Kulikovsky Dmitry <dkulikovsky@yandex-team.ru>  Thu, 09 Jan 2014 15:43:33 +0400
+
 yabs-graphite-ceres (0.2.1) unstable; urgency=low
 
   * version collision, rebuild
