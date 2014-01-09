@@ -20,7 +20,7 @@ div.overlay-close-button {
   background-color: rgb(140,140,255);
   color: #fff;
   font-family: monospace;
-  font-size: 50px;
+  font-size: 25px;
   font-weight: bold;
   text-align: center;
   width: 24px;
@@ -29,7 +29,7 @@ div.overlay-close-button {
   -webkit-border-radius: 0 5px;
   -khtml-border-radius: 0 5px;
   border-radius: 0 5px;
-  line-height: 53px;
+  line-height: 26px;
   cursor: pointer;
 }
 
