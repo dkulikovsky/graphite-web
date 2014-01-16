@@ -784,6 +784,26 @@ def movingAverage(requestContext, seriesList, windowSize):
 
   return result
 
+def discreteSticking(requestContext, seriesList):
+  results = []
+  for series in seriesList:
+    newValues = []
+    prev = None
+    for val in series:
+      if val is None: newValues.append(prev)
+      else:
+        prev = val
+        newValues.append(val)
+
+      if prev is None: prev = val
+
+    newName = "discreteSticking(%s)" % series.name
+    newSeries = TimeSeries(newName, series.start, series.end, series.step, newValues)
+    newSeries.pathExpression = newName
+    results.append(newSeries)
+  return results
+
+
 def cumulative(requestContext, seriesList, consolidationFunc='sum'):
   """
   Takes one metric or a wildcard seriesList, and an optional function.
@@ -3053,6 +3073,7 @@ SeriesFunctions = {
   'threshold' : threshold,
   'transformNull' : transformNull,
   'identity': identity,
+  'discreteSticking': discreteSticking,
 
   # test functions
   'time': timeFunction,
