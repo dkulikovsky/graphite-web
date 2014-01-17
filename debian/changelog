@@ -1,3 +1,9 @@
+yabs-graphite-ceres (0.2.1.2) unstable; urgency=low
+
+  * added event_by_date 
+
+ -- Kulikovsky Dmitry <dkulikovsky@yandex-team.ru>  Fri, 17 Jan 2014 20:11:57 +0400
+
 yabs-graphite-ceres (0.2.1.1) unstable; urgency=low
 
   * reduced size of fonts in menu
