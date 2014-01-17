@@ -2905,6 +2905,35 @@ def randomWalkFunction(requestContext, name):
             int(time.mktime(requestContext["endTime"].timetuple())),
             step, values)]
 
+def event_by_date(requestContext, e_date):
+  """
+    Returns single datapoint on requested date
+  """
+  def to_epoch(datetime_object):
+    return int(time.mktime(datetime_object.timetuple()))
+
+  step = 1
+  name = "event_by_date('%s')" % e_date
+
+  # Django returns database timestamps in timezone-ignorant datetime objects
+  # so we use epoch seconds and do the conversion ourselves
+  start_timestamp = to_epoch(requestContext["startTime"])
+  start_timestamp = start_timestamp - start_timestamp % step
+  end_timestamp = to_epoch(requestContext["endTime"])
+  end_timestamp = end_timestamp - end_timestamp % step
+  points = (end_timestamp - start_timestamp)/step
+
+  values = [None] * points
+  value_offset = (int(e_date) - start_timestamp)/step
+  if values[value_offset] is None:
+    values[value_offset] = 1
+  else:
+    values[value_offset] += 1
+
+  result_series = TimeSeries(name, start_timestamp, end_timestamp, step, values, 'sum')
+  result_series.pathExpression = name
+  return [result_series]
+
 def events(requestContext, *tags):
   """
   Returns the number of events at this point in time. Usable with
@@ -3085,6 +3114,7 @@ SeriesFunctions = {
 
   #events
   'events': events,
+  'event_by_date': event_by_date,
 }
 
 
