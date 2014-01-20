@@ -1,3 +1,9 @@
+yabs-graphite-ceres (0.2.1.3) unstable; urgency=low
+
+  * Adding discrete points sticking function 
+
+ -- Anna Sysoeva <antrue@yandex-team.ru>  Mon, 20 Jan 2014 15:46:10 +0400
+
 yabs-graphite-ceres (0.2.1.2) unstable; urgency=low
 
   * added event_by_date 
