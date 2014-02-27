@@ -17,7 +17,7 @@ from django.shortcuts import render_to_response
 from django.http import HttpResponse
 from django.conf import settings
 from graphite.account.models import Profile
-from graphite.util import getProfile, getProfileByUsername, defaultUser, json
+from graphite.util import getProfile, getProfileByUsername, json
 from graphite.logger import log
 try:
   from hashlib import md5
@@ -88,7 +88,7 @@ def browser(request):
 
 
 def search(request):
-  query = request.POST['query']
+  query = request.POST.get('query')
   if not query:
     return HttpResponse("")
 
@@ -218,7 +218,7 @@ def userGraphLookup(request):
   try:
 
     if not username:
-      profiles = Profile.objects.exclude(user=defaultUser)
+      profiles = Profile.objects.exclude(user__username='default')
 
       for profile in profiles:
         if profile.mygraph_set.count():

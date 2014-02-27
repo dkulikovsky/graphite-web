@@ -5,9 +5,9 @@ import sys
 # Simple python version test
 major,minor = sys.version_info[:2]
 py_version = sys.version.split()[0]
-if major != 2 or minor < 4:
+if major != 2 or minor < 5:
   # SystemExit defaults to returning 1 when printing a string to stderr
-  raise SystemExit("You are using python %s, but version 2.4 or greater is required" % py_version)
+  raise SystemExit("You are using python %s, but version 2.5 or greater is required" % py_version)
 
 required = 0
 optional = 0
@@ -94,7 +94,7 @@ except ImportError:
 
 
 if django and django.VERSION[:2] < (1,4):
-  sys.stderr.write("[REQUIRED] You have django version %s installed, but version 1.1 or greater is required\n" % django.get_version())
+  sys.stderr.write("[REQUIRED] You have django version %s installed, but version 1.4 or greater is required\n" % django.get_version())
   required += 1
 
 
@@ -171,6 +171,7 @@ try:
   import rrdtool
 except ImportError:
   sys.stderr.write("[OPTIONAL] Unable to import the 'python-rrdtool' module, this is required for reading RRD.\n")
+  optional += 1
 
 
 if optional:

@@ -7,10 +7,13 @@ from ceres import CeresTree, CeresNode, setDefaultSliceCachingBehavior
 from graphite.node import BranchNode, LeafNode
 from graphite.readers import CeresReader, WhisperReader, GzippedWhisperReader, RRDReader
 from graphite.util import find_escaped_pattern_fields
-
+from os.path import isdir, isfile, join, basename
+from django.conf import settings
 from graphite.logger import log
-
-#setDefaultSliceCachingBehavior('all')
+from graphite.node import BranchNode, LeafNode
+from graphite.readers import WhisperReader, GzippedWhisperReader, RRDReader
+from graphite.util import find_escaped_pattern_fields
+from . import fs_to_metric, get_real_metric_path, match_entries
 
 re_braces = re.compile(r'({[^{},]*,[^{}]*})')
 
@@ -54,7 +57,8 @@ class CeresFinder:
 class StandardFinder:
   DATASOURCE_DELIMETER = '::RRD_DATASOURCE::'
 
-  def __init__(self, directories):
+  def __init__(self, directories=None):
+    directories = directories or settings.STANDARD_DIRS
     self.directories = directories
 
   def find_nodes(self, query):
@@ -141,48 +145,3 @@ class StandardFinder:
 
       for basename in matching_files + matching_subdirs:
         yield join(current_dir, basename)
-
-
-def fs_to_metric(path):
-  dirpath = dirname(path)
-  filename = basename(path)
-  return join(dirpath, filename.split('.')[0]).replace('/','.')
-
-
-def get_real_metric_path(absolute_path, metric_path):
-  # Support symbolic links (real_metric_path ensures proper cache queries)
-  if islink(absolute_path):
-    real_fs_path = realpath(absolute_path)
-    relative_fs_path = metric_path.replace('.', '/')
-    base_fs_path = absolute_path[ :-len(relative_fs_path) ]
-    relative_real_fs_path = real_fs_path[ len(base_fs_path): ]
-    return fs_to_metric( relative_real_fs_path )
-
-  return metric_path
-
-def _deduplicate(entries):
-  yielded = set()
-  for entry in entries:
-    if entry not in yielded:
-      yielded.add(entry)
-      yield entry
-
-def match_entries(entries, pattern):
-  """A drop-in replacement for fnmatch.filter that supports pattern
-  variants (ie. {foo,bar}baz = foobaz or barbaz)."""
-  v1, v2 = pattern.find('{'), pattern.find('}')
-
-  if v1 > -1 and v2 > v1:
-    variations = pattern[v1+1:v2].split(',')
-    variants = [ pattern[:v1] + v + pattern[v2+1:] for v in variations ]
-    matching = []
-
-    for variant in variants:
-      matching.extend( fnmatch.filter(entries, variant) )
-
-    return list( _deduplicate(matching) ) #remove dupes without changing order
-
-  else:
-    matching = fnmatch.filter(entries, pattern)
-    matching.sort()
-    return matching

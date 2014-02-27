@@ -12,6 +12,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License."""
 
+import sys
 import time
 from graphite.logger import log
 from graphite.storage import STORE
@@ -69,7 +70,7 @@ class TimeSeries(list):
       return max(usable)
     if self.consolidationFunc == 'min':
       return min(usable)
-    raise Exception, "Invalid consolidation function!"
+    raise Exception("Invalid consolidation function!")
 
 
   def __repr__(self):
