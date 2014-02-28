@@ -3,7 +3,7 @@ import re
 import fnmatch
 from os.path import islink, isdir, isfile, realpath, join, dirname, basename
 from glob import glob
-from ceres import CeresTree, CeresNode, setDefaultSliceCachingBehavior
+from ceres import CeresTree, CeresNode
 from graphite.node import BranchNode, LeafNode
 from graphite.readers import CeresReader, WhisperReader, GzippedWhisperReader, RRDReader
 from graphite.util import find_escaped_pattern_fields
@@ -34,11 +34,13 @@ def braces_glob(s):
 
 
 class CeresFinder:
-  def __init__(self, directory):
+  def __init__(self, directory=None):
+    directory = directory or settings.CERES_DIR
     self.directory = directory
     self.tree = CeresTree(directory)
 
   def find_nodes(self, query):
+    log.info("running ceres finder %s" % query)
     for fs_path in braces_glob( self.tree.getFilesystemPath(query.pattern) ):
       metric_path = self.tree.getNodePath(fs_path)
 
@@ -62,6 +64,7 @@ class StandardFinder:
     self.directories = directories
 
   def find_nodes(self, query):
+    log.info("running blablabla RRd")
     clean_pattern = query.pattern.replace('\\', '')
     pattern_parts = clean_pattern.split('.')
 
