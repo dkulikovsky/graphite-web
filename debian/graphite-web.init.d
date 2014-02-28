@@ -1,10 +1,11 @@
 #!/bin/bash
 PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
-GRAPHITE_ROOT="/opt/graphite"
+GRAPHITE_ROOT="/var/lib/graphite"
 GRAPHITE_MANAGE_SCRIPT="/usr/share/pyshared/django/bin/django-admin.py"
 DAEMON="/usr/bin/python"
 PID_FILE="/var/run/graphite.pid"
-DARGS="$GRAPHITE_MANAGE_SCRIPT --pythonpath=$PYTHONPATH --settings=graphite.settings runfcgi method=prefork host=127.0.0.1 port=6031 pidfile=$PID_FILE workdir=$GRAPHITE_ROOT/webapp outlog=/var/log/graphite_out.log errlog=/var/log/graphite_err.log maxrequests=0 maxchildren=24 minspare=24 maxspare=24"
+PYTHONPATH="/var/lib/graphite/webapp"
+DARGS="$GRAPHITE_MANAGE_SCRIPT runfcgi --pythonpath=$PYTHONPATH --settings=graphite.settings method=prefork host=127.0.0.1 port=6031 pidfile=$PID_FILE workdir=$GRAPHITE_ROOT/webapp outlog=/var/log/graphite_out.log errlog=/var/log/graphite_err.log maxrequests=0 maxchildren=24 minspare=24 maxspare=24"
 NAME=graphite-web
 DESC="graphite web interface"
 
