@@ -1134,7 +1134,7 @@ function createFunctionsMenu() {
 //        {text: 'Add Threshold Line', handler: applyFuncToEachWithInput('threshold', 'Enter a threshold value')},
         {text: 'Draw Stacked', handler: applyFuncToEach('stacked')},
         {text: 'Draw in Second Y Axis', handler: applyFuncToEach('secondYAxis')},
-        {text: 'Discrete data sticking', handler: applyFuncToAll('discreteSticking', 'Sticking discrete data')}
+        {text: 'Discrete data sticking', handler: applyFuncToAll('discreteSticking', 'Sticking discrete data')},
         {text: 'Aggregate Line',
          menu: [
            {text: "Avg", handler: applyFuncToEach('aggregateLine', '"avg"')},
