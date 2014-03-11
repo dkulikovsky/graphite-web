@@ -16,7 +16,7 @@ import math
 import pytz
 from datetime import datetime
 import sys
-from time import time
+from time import time, mktime
 from random import shuffle
 from httplib import CannotSendRequest
 from urllib import urlencode
