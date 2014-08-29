@@ -18,6 +18,7 @@ from graphite.logger import log
 from graphite.storage import STORE
 from graphite.readers import FetchInProgress
 from django.conf import settings
+from collections import defaultdict
 
 class TimeSeries(list):
   def __init__(self, name, start, end, step, values, consolidate='average'):
@@ -89,6 +90,80 @@ class TimeSeries(list):
 
 
 # Data retrieval API
+def fetchDataMulti(requestContext, paths):
+
+    seriesList = []
+    startTime = int( time.mktime( requestContext['startTime'].timetuple() ) )
+    endTime = int( time.mktime( requestContext['endTime'].timetuple() ) )
+
+    def _fetchDataMulti(pathExpr, startTime, endTime, requestContext, seriesList):
+        multi_nodes = defaultdict(list)
+        single_nodes = []
+        for path in pathExpr:
+            matching_nodes = STORE.find(path, startTime, endTime)
+            for node in matching_nodes:
+                if hasattr(node, '__fetch_multi__'):
+                    multi_nodes[node.__fetch_multi__].append(node)
+                else:
+                    single_nodes.append(node)
+
+        fetches = [
+            (node, node.fetch(startTime, endTime)) for node in single_nodes]
+
+        for finder in STORE.finders:
+            if not hasattr(finder, '__fetch_multi__'):
+                continue
+            nodes = multi_nodes[finder.__fetch_multi__]
+            if not nodes:
+                continue
+            time_info, series = finder.fetch_multi(nodes, startTime, endTime)
+            start, end, step = time_info
+            for path, values in series.items():
+                series = TimeSeries(path, start, end, step, values)
+                series.pathExpression = pathExpr
+                seriesList.append(series)
+
+        for node, results in fetches:
+            if not results:
+                logger.info("no results", node=node, start=startTime,
+                            end=endTime)
+                continue
+
+            try:
+                timeInfo, values = results
+            except ValueError as e:
+                raise Exception("could not parse timeInfo/values from metric "
+                                "'%s': %s" % (node.path, e))
+            start, end, step = timeInfo
+
+            series = TimeSeries(node.path, start, end, step, values)
+            # hack to pass expressions through to render functions
+            series.pathExpression = pathExpr
+            seriesList.append(series)
+
+        # Prune empty series with duplicate metric paths to avoid showing
+        # empty graph elements for old whisper data
+        names = set([s.name for s in seriesList])
+        for name in names:
+            series_with_duplicate_names = [
+                s for s in seriesList if s.name == name]
+            empty_duplicates = [
+                s for s in series_with_duplicate_names
+                if not nonempty(series)]
+
+            if (
+                series_with_duplicate_names == empty_duplicates and
+                len(empty_duplicates) > 0
+            ):  # if they're all empty
+                empty_duplicates.pop()  # make sure we leave one in seriesList
+
+            for series in empty_duplicates:
+                seriesList.remove(series)
+
+        return seriesList
+
+    return _fetchDataMulti(paths, startTime, endTime, requestContext, seriesList)
+
 def fetchData(requestContext, pathExpr):
 
   seriesList = []
@@ -96,7 +171,32 @@ def fetchData(requestContext, pathExpr):
   endTime   = int( time.mktime( requestContext['endTime'].timetuple() ) )
   def _fetchData(pathExpr,startTime, endTime, requestContext, seriesList):
     matching_nodes = STORE.find(pathExpr, startTime, endTime, local=requestContext['localOnly'])
-    fetches = [(node, node.fetch(startTime, endTime)) for node in matching_nodes if node.is_leaf]
+
+    # Group nodes that support multiple fetches
+    multi_nodes = defaultdict(list)
+    single_nodes = []
+    for node in matching_nodes:
+        if not node.is_leaf:
+            continue
+        if hasattr(node, '__fetch_multi__'):
+            multi_nodes[node.__fetch_multi__].append(node)
+        else:
+            single_nodes.append(node)
+
+    fetches = [(node, node.fetch(startTime, endTime)) for node in single_nodes]
+
+    for finder in STORE.finders:
+        if not hasattr(finder, '__fetch_multi__'):
+            continue
+        nodes = multi_nodes[finder.__fetch_multi__]
+        if not nodes:
+            continue
+        time_info, series = finder.fetch_multi(nodes, startTime, endTime)
+        start, end, step = time_info
+        for path, values in series.items():
+            series = TimeSeries(path, start, end, step, values)
+            series.pathExpression = pathExpr
+            seriesList.append(series)
 
     for node, results in fetches:
       if isinstance(results, FetchInProgress):

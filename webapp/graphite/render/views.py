@@ -37,7 +37,7 @@ from graphite.util import getProfileByUsername, getProfile, json, unpickle
 from graphite.compat import HttpResponse
 from graphite.remote_storage import HTTPConnectionWithTimeout
 from graphite.logger import log
-from graphite.render.evaluator import evaluateTarget
+from graphite.render.evaluator import evaluateTarget, evaluateTargets
 from graphite.render.attime import parseATTime
 from graphite.render.functions import PieFunctions
 from graphite.render.hashing import hashRequest, hashData
@@ -83,6 +83,7 @@ def renderView(request):
       log.cache('Request-Cache miss [%s]' % requestKey)
 
   # Now we prepare the requested data
+  targetsList = []
   if requestOptions['graphType'] == 'pie':
     for target in requestOptions['targets']:
       if target.find(':') >= 0:
@@ -93,11 +94,13 @@ def renderView(request):
           raise ValueError("Invalid target '%s'" % target)
         data.append( (name,value) )
       else:
-        seriesList = evaluateTarget(requestContext, target)
+        targetsList.append(target)
 
-        for series in seriesList:
-          func = PieFunctions[requestOptions['pieMode']]
-          data.append( (series.name, func(requestContext, series) or 0 ))
+      seriesList = evaluateTargets(requestContext, targetsList)
+
+      for series in seriesList:
+        func = PieFunctions[requestOptions['pieMode']]
+        data.append( (series.name, func(requestContext, series) or 0 ))
 
   elif requestOptions['graphType'] == 'line':
     # Let's see if at least our data is cached
@@ -117,13 +120,15 @@ def renderView(request):
     if cachedData is not None:
       requestContext['data'] = data = cachedData
     else: # Have to actually retrieve the data now
+      t = time()
       for target in requestOptions['targets']:
         if not target.strip():
           continue
-        t = time()
-        seriesList = evaluateTarget(requestContext, target)
-        log.rendering("Retrieval of %s took %.6f" % (target, time() - t))
-        data.extend(seriesList)
+        targetsList.append(target)
+
+      seriesList = evaluateTargets(requestContext, targetsList)
+      log.rendering("Retrieval of '%s' took %.6f" % (targetsList, time() - t))
+      data.extend(seriesList)
 
       if useCache:
         cache.add(dataKey, data, cacheTimeout)
