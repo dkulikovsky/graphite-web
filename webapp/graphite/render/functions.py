@@ -137,14 +137,22 @@ def normalize(seriesLists):
 
 def formatPathExpressions(seriesList):
    # remove duplicates
-   pathExpressions = []
-   [pathExpressions.append(s.pathExpression) for s in seriesList if not pathExpressions.count(s.pathExpression)]
-   return ','.join(pathExpressions)
+   pathExpressions = set()
+   for s in seriesList:
+       if isinstance(s.pathExpression, list):
+           pathExpressions.add(s.pathExpression[0])
+       else:
+           pathExpressions.add(s.pathExpression)
+   return ','.join(sorted(pathExpressions))
 
 def formatPathExpressions_diff_special(seriesList):
    # remove duplicates
    pathExpressions = []
-   [pathExpressions.append(s.name) for s in seriesList]
+   for s in seriesList:
+       if isinstance(s.pathExpression, list):
+           pathExpressions.append(s.pathExpression[0])
+       else:
+           pathExpressions.append(s.pathExpression)
    return ','.join(pathExpressions)
 
 
@@ -1888,7 +1896,7 @@ def useSeriesAbove(requestContext, seriesList, value, search, replace):
   for series in seriesList:
     newname = re.sub(search, replace, series.name)
     if max(series) > value:
-      n = evaluateTarget(requestContext, newname)
+      n = evaluateTargets(requestContext, [newname])
       if n is not None and len(n) > 0:
         newSeries.append(n[0])
 
@@ -2005,12 +2013,14 @@ def _fetchWithBootstrap(requestContext, seriesList, **delta_kwargs):
   bootstrapContext['endTime'] = requestContext['startTime']
 
   bootstrapList = []
+  bootstrapPathExpressions = []
   for series in seriesList:
     if series.pathExpression in [ b.pathExpression for b in bootstrapList ]:
       # This pathExpression returns multiple series and we already fetched it
       continue
-    bootstraps = evaluateTarget(bootstrapContext, series.pathExpression)
-    bootstrapList.extend(bootstraps)
+    bootstrapPathExpressions.append(series.pathExpression)
+  bootstraps = evaluateTargets(bootstrapContext, series.pathExpression)
+  bootstrapList.extend(bootstraps)
 
   newSeriesList = []
   for bootstrap, original in zip(bootstrapList, seriesList):
@@ -2336,7 +2346,7 @@ def timeStack(requestContext, seriesList, timeShiftUnit, timeShiftStart, timeShi
     innerDelta = delta * shft
     myContext['startTime'] = requestContext['startTime'] + innerDelta
     myContext['endTime'] = requestContext['endTime'] + innerDelta
-    for shiftedSeries in evaluateTarget(myContext, series.pathExpression):
+    for shiftedSeries in evaluateTargets(myContext, [series.pathExpression]):
       shiftedSeries.name = 'timeShift(%s, %s, %s)' % (shiftedSeries.name, timeShiftUnit,shft)
       shiftedSeries.pathExpression = shiftedSeries.name
       shiftedSeries.start = series.start
@@ -2383,7 +2393,7 @@ def timeShift(requestContext, seriesList, timeShift, resetEnd=True):
   if len(seriesList) > 0:
     series = seriesList[0] # if len(seriesList) > 1, they will all have the same pathExpression, which is all we care about.
 
-  for shiftedSeries in evaluateTarget(myContext, series.pathExpression):
+  for shiftedSeries in evaluateTargets(myContext, [series.pathExpression]):
     shiftedSeries.name = 'timeShift(%s, "%s")' % (shiftedSeries.name, timeShift)
     if resetEnd:
       shiftedSeries.end = series.end
@@ -2727,14 +2737,9 @@ def smartSummarize(requestContext, seriesList, intervalString, func='sum', align
   elif interval >= MINUTE:
     requestContext['startTime'] = datetime(s.year, s.month, s.day, s.hour, s.minute)
 
-  for i,series in enumerate(seriesList):
-    # XXX: breaks with summarize(metric.{a,b})
-    #      each series.pathExpression == metric.{a,b}
-    newSeries = evaluateTarget(requestContext, series.pathExpression)[0]
-    series[0:len(series)] = newSeries
-    series.start = newSeries.start
-    series.end = newSeries.end
-    series.step = newSeries.step
+  # XXX: breaks with summarize(metric.{a,b})
+  pathExpressions = [series.pathExpression for series in seriesList]
+  seriesList = evaluateTargets(requestContext, pathExpressions)
 
   for series in seriesList:
     buckets = {} # { timestamp: [values] }
@@ -2900,8 +2905,15 @@ def hitcount(requestContext, seriesList, intervalString, alignToInterval = False
     elif interval >= MINUTE:
       requestContext['startTime'] = datetime(s.year, s.month, s.day, s.hour, s.minute)
 
-    for i,series in enumerate(seriesList):
-      newSeries = evaluateTarget(requestContext, series.pathExpression)[0]
+    pathExpressionList = [series.pathExpression for series in seriesList]
+    newSeriesList = evaluateTargets(requestContext, pathExpressionList)
+    newSeries = None
+    for i, series in enumerate(seriesList):
+      for i in range(len(newSeriesList)):
+        if newSeriesList[i].pathExpression[0] == series.pathExpression:
+          newSeries = newSeriesList[i]
+          del newSeriesList[i]
+          break
       intervalCount = int((series.end - series.start) / interval)
       series[0:len(series)] = newSeries
       series.start = newSeries.start
@@ -3298,4 +3310,4 @@ SeriesFunctions = {
 
 #Avoid import circularity
 if not environ.get('READTHEDOCS'):
-  from graphite.render.evaluator import evaluateTarget
+  from graphite.render.evaluator import evaluateTarget, evaluateTargets
